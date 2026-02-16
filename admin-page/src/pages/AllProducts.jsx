@@ -70,7 +70,7 @@ function AllProducts() {
                             {products && products.length > 0 ? (
                                 products.map((product) => (
                                     <tr
-                                        key={product._id}
+                                        key={product.id}
                                         className="border-b border-gray-200 hover:bg-gray-50"
                                     >
                                         <td className="px-5 py-4 text-sm bg-white">
@@ -111,7 +111,7 @@ function AllProducts() {
                                         </td>
 
                                         <td className="px-5 py-4 text-sm text-gray-500 bg-white">
-                                            <p className="font-mono text-xs">{product._id}</p>
+                                            <p className="font-mono text-xs">{product.id}</p>
                                         </td>
                                     </tr>
                                 ))

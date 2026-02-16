@@ -15,7 +15,7 @@ import {
     X,
 } from "lucide-react";
 import { getProductById } from "../features/product/productAction";
-import { createOrder } from "../features/orders/orderAction";
+import { createOrder, createOrderFromCart } from "../features/orders/orderAction";
 import { resetOrderState } from "../features/appFeatures/orderSlice";
 import { addAddress } from "../features/appFeatures/authSlice";
 
@@ -66,6 +66,18 @@ function CheckoutPage() {
 
     const safeUser = user || JSON.parse(localStorage.getItem("user")) || {};
     const addresses = safeUser.address || [];
+    const cartItems = safeUser.cart_items || [];
+    
+    // Determine order items: Single Product or Cart Items
+    const orderItems = id 
+        ? (product ? [{ product, quantity: 1 }] : []) 
+        : cartItems.map(item => ({ product: item.product || item, quantity: item.quantity || 1 }));
+
+    // Calculate billing details
+    const subtotal = orderItems.reduce((acc, item) => {
+        return acc + (Number(item.product?.price) || 0) * item.quantity;
+    }, 0);
+    const totalAmount = subtotal; // Shipping is free
 
     useEffect(() => {
         if (id) {
@@ -91,21 +103,34 @@ function CheckoutPage() {
         }
 
         const baseOrderData = {
-            address: selectedAddress._id,
+            address: selectedAddress.id,
             payment_mode: paymentMethod,
         };
 
         try {
             if (paymentMethod === "COD") {
-                const resultAction = await dispatch(
-                    createOrder({
-                        id: product._id,
-                        orderData: { ...baseOrderData, payment_status: "PENDING" },
-                    })
-                ).unwrap();
+                let resultAction;
+                
+                if (id) {
+                     // Single Product Order
+                    resultAction = await dispatch(
+                        createOrder({
+                            id: product.id,
+                            orderData: { ...baseOrderData, payment_status: "PENDING" },
+                        })
+                    ).unwrap();
+                } else {
+                    // Cart Order
+                     resultAction = await dispatch(
+                        createOrderFromCart({
+                             ...baseOrderData, 
+                             payment_status: "PENDING" 
+                        })
+                    ).unwrap();
+                }
 
                 const newOrderId =
-                    resultAction._id || resultAction.order?._id || resultAction.data?._id;
+                    resultAction.id || resultAction.order?.id || resultAction.data?.id;
 
                 if (newOrderId) {
                     dispatch(resetOrderState());
@@ -125,23 +150,37 @@ function CheckoutPage() {
                     return;
                 }
 
-                // Step 1: Create Razorpay order on backend
                 const token = localStorage.getItem("jwtToken");
-                const createRes = await fetch(
-                    `${import.meta.env.VITE_BACKEND_BASE_API}/payment/create-order`,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({
-                            product_id: product._id,
-                            quantity: 1,
-                        }),
-                    }
-                );
-                const createData = await createRes.json();
+                let createRes, createData;
+
+                if (id) {
+                     // Single Product Razorpay Order
+                    createRes = await fetch(
+                        `${import.meta.env.VITE_BACKEND_BASE_API}/payment/create-order`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({
+                                product_id: product.id,
+                                quantity: 1,
+                            }),
+                        }
+                    );
+                } else {
+                    // TODO: Backend needs to support creating razorpay order for CART total
+                    // For now, blocking online payment for cart or handling it if backend supports
+                    // Assuming similar endpoint or updated params. 
+                    // Since specific Razorpay Cart endpoint wasn't in plan, we might need value-add logic here
+                    // blocking for now or treating as "total amount" request
+                    alert("Online payment for Cart is coming soon! Please use COD.");
+                    setIsProcessing(false);
+                    return;
+                }
+                
+                createData = await createRes.json();
 
                 if (!createRes.ok) {
                     alert(createData.error_message || "Failed to create payment order");
@@ -158,8 +197,8 @@ function CheckoutPage() {
                     currency: currency,
                     order_id: order_id,
                     name: "ShopHub Store",
-                    description: `Order for ${product.product_name}`,
-                    image: product.image,
+                    description: id ? `Order for ${product.product_name}` : "Cart Order",
+                    image: id ? product.image : "https://via.placeholder.com/150", // generic image for cart
                     prefill: {
                         name: `${safeUser.first_name} ${safeUser.last_name}`,
                         email: safeUser.email,
@@ -169,6 +208,21 @@ function CheckoutPage() {
                     handler: async function (response) {
                         try {
                             // Step 3: Verify payment on backend
+                            const verifyBody = {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                address_id: selectedAddress.id,
+                            };
+                            
+                            if (id) {
+                                verifyBody.product_id = product.id;
+                                verifyBody.quantity = 1;
+                            } else {
+                                // For cart, we might need a different verification endpoint or updated one
+                                // Assuming verify handles it or it's part of the pending TODO
+                            }
+
                             const verifyRes = await fetch(
                                 `${import.meta.env.VITE_BACKEND_BASE_API}/payment/verify`,
                                 {
@@ -177,20 +231,13 @@ function CheckoutPage() {
                                         "Content-Type": "application/json",
                                         Authorization: `Bearer ${token}`,
                                     },
-                                    body: JSON.stringify({
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_signature: response.razorpay_signature,
-                                        product_id: product._id,
-                                        address_id: selectedAddress._id,
-                                        quantity: 1,
-                                    }),
+                                    body: JSON.stringify(verifyBody),
                                 }
                             );
                             const verifyData = await verifyRes.json();
 
                             if (verifyRes.ok && verifyData.data) {
-                                const newOrderId = verifyData.data._id || verifyData.data.id;
+                                const newOrderId = verifyData.data.id;
                                 dispatch(resetOrderState());
                                 navigate(`/product-checkout/success/${newOrderId}`);
                             } else {
@@ -258,13 +305,25 @@ function CheckoutPage() {
         );
     }
 
-    if (!product) {
+    if (id && !product) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
                 <p className="font-medium text-gray-600">Product not found.</p>
                 <Link to="/" className="mt-4 text-indigo-600 hover:underline">
                     Go Home
+                </Link>
+            </div>
+        );
+    }
+
+    if (!id && cartItems.length === 0) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+                <ShoppingBag className="h-12 w-12 text-gray-400 mb-4" />
+                <p className="font-medium text-gray-600">Your cart is empty.</p>
+                <Link to="/products" className="mt-4 text-indigo-600 hover:underline">
+                    Start Shopping
                 </Link>
             </div>
         );
@@ -421,29 +480,33 @@ function CheckoutPage() {
                                 <ShoppingBag className="text-indigo-600" size={20} /> Order Summary
                             </h2>
 
-                            <div className="flex gap-4 mb-6 pb-6 border-b border-gray-100">
-                                <div className="h-20 w-20 shrink-0 rounded-lg bg-gray-100 border border-gray-200 p-1">
-                                    <img
-                                        src={product.image}
-                                        alt={product.product_name}
-                                        className="h-full w-full object-contain mix-blend-multiply"
-                                    />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-900 line-clamp-2 text-sm leading-snug">
-                                        {product.product_name}
-                                    </h3>
-                                    <p className="text-gray-500 text-xs mt-1">Quantity: 1</p>
-                                    <p className="text-indigo-600 font-bold mt-1 text-base">
-                                        {formatPrice(product.price)}
-                                    </p>
-                                </div>
+                            <div className="space-y-4 mb-6 pb-6 border-b border-gray-100 max-h-80 overflow-y-auto pr-2">
+                                {orderItems.map((item, idx) => (
+                                    <div key={idx} className="flex gap-4">
+                                        <div className="h-16 w-16 shrink-0 rounded-lg bg-gray-100 border border-gray-200 p-1">
+                                            <img
+                                                src={item.product?.image}
+                                                alt={item.product?.product_name}
+                                                className="h-full w-full object-contain mix-blend-multiply"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-gray-900 line-clamp-2 text-sm leading-snug">
+                                                {item.product?.product_name}
+                                            </h3>
+                                            <p className="text-gray-500 text-xs mt-1">Quantity: {item.quantity}</p>
+                                            <p className="text-indigo-600 font-bold mt-1 text-sm">
+                                                {formatPrice(item.product?.price || 0)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="space-y-3 text-sm mb-6">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Subtotal</span>
-                                    <span>{formatPrice(product.price)}</span>
+                                    <span>{formatPrice(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Shipping</span>
@@ -451,7 +514,7 @@ function CheckoutPage() {
                                 </div>
                                 <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-lg text-gray-900">
                                     <span>Total Amount</span>
-                                    <span>{formatPrice(product.price)}</span>
+                                    <span>{formatPrice(totalAmount)}</span>
                                 </div>
                             </div>
 

@@ -114,7 +114,7 @@ function CartPage() {
                             <div className="divide-y divide-gray-100">
                                 {cartItems.map((item) => {
                                     const product = item.product || item;
-                                    const productId = product._id || product.id;
+                                    const productId = product.id;
                                     const qty = item.quantity || 1;
 
                                     return (
@@ -241,7 +241,11 @@ function CartPage() {
                             </div>
 
                             <button
-                                onClick={() => navigate("/checkout")}
+                                onClick={() => {
+                                    if (cartItems.length > 0) {
+                                        navigate("/checkout");
+                                    }
+                                }}
                                 className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 hover:shadow-xl hover:-translate-y-0.5"
                             >
                                 Checkout <ArrowRight size={18} />

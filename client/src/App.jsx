@@ -12,14 +12,18 @@ import OrderProductDetailsPage from "./pages/OrderProductDetailsPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import SuccessOrderPage from "./pages/SuccessOrderPage";
 import OAuth2RedirectPage from "./pages/OAuth2RedirectPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
     return (
         <BrowserRouter>
+            <Toaster />
             <ScrollToTop />
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<AllProducts />} />
+                <Route path="/product/:id" element={<ProductDetailsPage />} />
 
                 <Route
                     path="/auth/user"
@@ -53,6 +57,15 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <OrderProductDetailsPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/checkout"
+                    element={
+                        <ProtectedRoute>
+                            <CheckoutPage />
                         </ProtectedRoute>
                     }
                 />

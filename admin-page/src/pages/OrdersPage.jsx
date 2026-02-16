@@ -109,15 +109,15 @@ function OrdersPage() {
                                 <tbody>
                                     {orders.map((order) => (
                                         <tr
-                                            key={order._id}
+                                            key={order.id}
                                             className="border-b border-gray-200 hover:bg-gray-50"
                                         >
                                             <td className="px-5 py-5 text-sm bg-white">
                                                 <p
                                                     className="text-gray-900 whitespace-nowrap"
-                                                    title={order._id}
+                                                    title={order.id}
                                                 >
-                                                    #{order._id?.slice(-6).toUpperCase()}
+                                                    #{order.id?.slice(-6).toUpperCase()}
                                                 </p>
                                             </td>
 

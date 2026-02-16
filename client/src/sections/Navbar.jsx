@@ -53,7 +53,7 @@ export default function Navbar() {
 
     useEffect(() => {
         dispatch(getUserDetails());
-    }, [dispatch, user?._id]);
+    }, [dispatch, user?.id]);
 
     const finalCartItems = useMemo(() => {
         return user?.cart_items || [];

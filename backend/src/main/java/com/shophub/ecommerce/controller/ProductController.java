@@ -16,6 +16,7 @@ public class ProductController {
 
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable String id) {
+        System.out.println(id);
         Product product = productService.getProductById(id);
         return ResponseEntity.ok(ApiResponse.success("Product fetched", product));
     }

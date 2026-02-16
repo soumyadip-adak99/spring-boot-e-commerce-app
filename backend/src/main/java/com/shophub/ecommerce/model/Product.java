@@ -1,6 +1,5 @@
 package com.shophub.ecommerce.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,11 +25,11 @@ public class Product implements Serializable {
     private String id;
 
     @Field("product_name")
-    @JsonProperty("productName")
-    @JsonAlias("product_name")
+    @JsonProperty("product_name")
     private String productName;
 
     @Field("product_description")
+    @JsonProperty("product_description")
     private String productDescription;
 
     private double price;

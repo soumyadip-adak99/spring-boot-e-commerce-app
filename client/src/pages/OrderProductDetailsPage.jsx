@@ -23,7 +23,7 @@ export default function OrderProductDetailsPage() {
     const { user } = useSelector((state) => state.auth);
     const safeUser = user || JSON.parse(localStorage.getItem("user")) || {};
 
-    const order = safeUser.orders?.find((o) => o._id === orderId);
+    const order = safeUser.orders?.find((o) => o.id === orderId);
 
     const shippingAddress =
         safeUser.address && safeUser.address.length > 0 ? safeUser.address[0] : null;
@@ -122,7 +122,7 @@ export default function OrderProductDetailsPage() {
                                 <div>
                                     <div className="flex items-center gap-3">
                                         <h1 className="text-2xl font-bold text-gray-900">
-                                            Order #{order._id.slice(-6).toUpperCase()}
+                                            Order #{order.id.slice(-6).toUpperCase()}
                                         </h1>
                                         <span
                                             className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
@@ -161,49 +161,96 @@ export default function OrderProductDetailsPage() {
                                     <Package size={18} className="text-indigo-600" /> Order Items
                                 </h2>
                             </div>
-                            <div className="p-6">
-                                <div className="flex items-start gap-5">
-                                    <div className="h-24 w-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
-                                        {order.image ? (
-                                            <img
-                                                src={order.image}
-                                                alt={order.product_name}
-                                                className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
-                                            />
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                                <ShoppingBag size={32} />
+                            <div className="p-6 divide-y divide-gray-100">
+                                {order.items && order.items.length > 0 ? (
+                                    order.items.map((item, index) => (
+                                        <div key={index} className="flex items-start gap-5 py-4 first:pt-0 last:pb-0">
+                                            <div className="h-24 w-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+                                                {item.image ? (
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.product_name}
+                                                        className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                                                    />
+                                                ) : (
+                                                    <div className="h-full w-full flex items-center justify-center text-gray-400">
+                                                        <ShoppingBag size={32} />
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
 
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mb-2">
-                                                    <Tag size={10} /> {order.category}
-                                                </span>
-                                                <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                                                    {order.product_name}
-                                                </h3>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mb-2">
+                                                            <Tag size={10} /> {item.category}
+                                                        </span>
+                                                        <h3 className="font-bold text-gray-900 text-lg leading-tight">
+                                                            {item.product_name}
+                                                        </h3>
+                                                    </div>
+                                                    <p className="font-bold text-gray-900 text-lg">
+                                                        ₹{item.price}
+                                                    </p>
+                                                </div>
+
+                                                <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
+                                                    {item.product_description ||
+                                                        "No description available."}
+                                                </p>
+
+                                                <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
+                                                    <span>Qty: {item.quantity || 1}</span>
+                                                    <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                                    <span className="font-mono">ID: {item.product_id}</span>
+                                                </div>
                                             </div>
-                                            <p className="font-bold text-gray-900 text-lg">
-                                                ₹{order.price}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="flex items-start gap-5">
+                                        <div className="h-24 w-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+                                            {order.image ? (
+                                                <img
+                                                    src={order.image}
+                                                    alt={order.product_name}
+                                                    className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                                                />
+                                            ) : (
+                                                <div className="h-full w-full flex items-center justify-center text-gray-400">
+                                                    <ShoppingBag size={32} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mb-2">
+                                                        <Tag size={10} /> {order.category}
+                                                    </span>
+                                                    <h3 className="font-bold text-gray-900 text-lg leading-tight">
+                                                        {order.product_name}
+                                                    </h3>
+                                                </div>
+                                                <p className="font-bold text-gray-900 text-lg">
+                                                    ₹{order.price}
+                                                </p>
+                                            </div>
+
+                                            <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
+                                                {order.product_description ||
+                                                    "No description available."}
                                             </p>
-                                        </div>
 
-                                        <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
-                                            {order.product_description ||
-                                                "No description available."}
-                                        </p>
-
-                                        <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
-                                            <span>Qty: 1</span>
-                                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                            <span className="font-mono">ID: {order._id}</span>
+                                            <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
+                                                <span>Qty: 1</span>
+                                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                                <span className="font-mono">ID: {order.id}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>

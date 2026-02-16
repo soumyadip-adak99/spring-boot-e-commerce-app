@@ -71,6 +71,18 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Order created successfully", order));
     }
 
+    @PostMapping("/create-order/cart")
+    public ResponseEntity<ApiResponse> createOrderFromCart(@AuthenticationPrincipal User user,
+            @RequestBody OrderRequest request) {
+        Order order = orderService.createOrderFromCart(
+                user.getEmail(),
+                request.getPayment_status(),
+                request.getPayment_mode(),
+                request.getAddress(),
+                null, null, null);
+        return ResponseEntity.ok(ApiResponse.success("Order created from cart successfully", order));
+    }
+
     @PostMapping("/add-address")
     public ResponseEntity<ApiResponse> addAddress(@AuthenticationPrincipal User user,
             @RequestBody AddressRequest request) {

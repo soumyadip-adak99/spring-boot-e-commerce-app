@@ -11,16 +11,17 @@ import {
 
 import CategoryFilter from "../components/CategoryFilter";
 import ProductCard from "../components/ProductCard";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../sections/Navbar";
-import ProductModal from "../components/ProductModal";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../features/product/productAction";
 import { addToCart } from "../features/cart/cartAction";
+import toast from "react-hot-toast";
 
 export default function AllProducts() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const productState = useSelector((state) => state.product);
     const { products, isLoading, isError } = productState || {
@@ -35,18 +36,17 @@ export default function AllProducts() {
     const [maxPrice, setMaxPrice] = useState(500);
     const [sortOption, setSortOption] = useState("recommended");
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
         dispatch(getAllProducts());
     }, [dispatch]);
 
     const handleAddToCart = async (product) => {
-        if (!product?._id) return;
+        if (!product?.id) return;
 
         try {
-            await dispatch(addToCart({ productId: product._id, quantity: 1 })).unwrap();
-            alert(`${product.productName} added to cart successfully!`);
+            await dispatch(addToCart({ productId: product.id, quantity: 1 })).unwrap();
+            toast.success(`${product.product_name} added to cart successfully!`);
         } catch (error) {
             const errorMessage =
                 typeof error === "string" ? error : error.message || "Failed to add to cart";
@@ -228,22 +228,15 @@ export default function AllProducts() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filteredProducts.map((product) => (
                                     <ProductCard
-                                        key={product._id}
+                                        key={product.id}
                                         product={product}
                                         onAddToCart={handleAddToCart}
-                                        onViewDetails={(p) => setSelectedProduct(p)}
+                                        onViewDetails={(p) => navigate(`/product/${p.id}`)}
                                     />
                                 ))}
                             </div>
                         )}
                     </main>
-
-                    {selectedProduct && (
-                        <ProductModal
-                            product={selectedProduct}
-                            onClose={() => setSelectedProduct(null)}
-                        />
-                    )}
                 </div>
             </div>
         </div>

@@ -184,7 +184,7 @@ export default function ProductModal({ product, onClose }) {
 
                         <div className="w-full">
                             <button
-                                onClick={() => navigate(`/buy-product/${product?._id}`)}
+                                onClick={() => navigate(`/buy-product/${product?.id}`)}
                                 className="w-full bg-indigo-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                             >
                                 <CreditCard size={20} />

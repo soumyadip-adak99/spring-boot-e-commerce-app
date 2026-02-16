@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -32,12 +33,33 @@ public class Order implements Serializable {
     @Field("userId")
     private String userId;
 
+    @Field("user_name")
+    private String userName;
+
+    @Field("user_email")
+    private String userEmail;
+
+    @Field("user_phone_number")
+    private String userPhoneNumber;
+
+    @Field("shipping_address")
+    private String shippingAddress;
+
+    @Field("total_amount")
+    private Double totalAmount;
+
     private String address;
 
+    @Field("product")
+    @Deprecated
     private String product;
 
     @Builder.Default
+    @Deprecated
     private int quantity = 1;
+
+    @Field("order_items")
+    private List<OrderItem> orderItems;
 
     @Field("razorpay_order_id")
     private String razorpayOrderId;

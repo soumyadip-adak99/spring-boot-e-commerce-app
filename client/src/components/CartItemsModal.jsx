@@ -29,7 +29,7 @@ export default function CartItemsModal({ userCartItems, totalPrice }) {
                     <div className="divide-y divide-gray-50">
                         {userCartItems.map((item) => (
                             <div
-                                key={item._id || Math.random()}
+                                key={item.id || Math.random()}
                                 className="flex items-center gap-4 p-4 hover:bg-gray-50/80 transition-colors group"
                             >
                                 <div className="h-12 w-12 shrink-0 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:border-indigo-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">

@@ -58,7 +58,7 @@ function AddProductModal({ isOpen, onClose }) {
             }
 
             const data = new FormData();
-            data.append("productName", formData.productName);
+            data.append("product_name", formData.productName);
             data.append("product_description", formData.product_description);
             data.append("price", formData.price);
             data.append("category", formData.category);

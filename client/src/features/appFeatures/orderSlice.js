@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createOrder } from "../orders/orderAction";
+import { createOrder, createOrderFromCart } from "../orders/orderAction";
 
 const initialState = {
     order: null,
@@ -39,6 +39,24 @@ const orderSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.errorMessage = action.payload || "Failed to place order";
+            })
+            // createOrderFromCart
+            .addCase(createOrderFromCart.pending, (state) => {
+                state.isLoading = true;
+                state.isError = false;
+                state.isSuccess = false;
+            })
+            .addCase(createOrderFromCart.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.order = action.payload;
+                state.errorMessage = "";
+            })
+            .addCase(createOrderFromCart.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.errorMessage = action.payload || "Failed to place order from cart";
             });
     },
 });

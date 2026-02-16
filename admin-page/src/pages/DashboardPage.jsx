@@ -29,7 +29,7 @@ function DashboardPage() {
                 calculatedStats.success += 1;
 
                 if (products && products.length > 0) {
-                    const productDetail = products.find((p) => p._id === order.product);
+                    const productDetail = products.find((p) => p.id === order.product);
 
                     if (productDetail) {
                         calculatedStats.revenue += productDetail.price || 0;
@@ -45,13 +45,13 @@ function DashboardPage() {
 
     const getProductName = (productId) => {
         if (!products) return "Loading...";
-        const prod = products.find((p) => p._id === productId);
+        const prod = products.find((p) => p.id === productId);
         return prod ? prod.product_name : "Unknown Product";
     };
 
     const getProductPrice = (productId) => {
         if (!products) return 0;
-        const prod = products.find((p) => p._id === productId);
+        const prod = products.find((p) => p.id === productId);
         return prod ? prod.price : 0;
     };
 
@@ -137,9 +137,9 @@ function DashboardPage() {
                                     .reverse()
                                     .slice(0, 5)
                                     .map((order) => (
-                                        <tr key={order._id}>
+                                        <tr key={order.id}>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                                #{order._id.slice(-6).toUpperCase()}
+                                                #{order.id.slice(-6).toUpperCase()}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500">
                                                 {getProductName(order.product)}

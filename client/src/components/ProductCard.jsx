@@ -1,7 +1,6 @@
 import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
 
 const ProductCard = ({ product, onAddToCart, onViewDetails }) => {
-    console.log(product);
     return (
         <div className="bg-white w-full max-w-sm rounded-xl shadow-sm hover:shadow-md transition-all border border-gray-200 overflow-hidden flex flex-col">
             <figure className="relative h-56 bg-gray-100 overflow-hidden">

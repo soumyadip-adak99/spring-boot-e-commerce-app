@@ -56,7 +56,7 @@ function ProductSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {products?.map((product) => (
                         <div
-                            key={product._id}
+                            key={product.id}
                             className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col"
                         >
                             <div className="relative h-48 overflow-hidden group">
@@ -85,7 +85,7 @@ function ProductSection() {
 
                                 <div className="flex items-center justify-center mt-auto pt-4 border-t border-gray-100">
                                     <button
-                                        onClick={() => navigate(`/products`)}
+                                        onClick={() => navigate(`/product/${product.id}`)}
                                         disabled={product.status === "OUT_OF_STOCK"}
                                         className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${
                                             product.status === "OUT_OF_STOCK"

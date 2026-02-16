@@ -253,7 +253,7 @@ export default function ProfilePage() {
                     {userOrders.length > 0 ? (
                         userOrders.map((order) => (
                             <div
-                                key={order._id}
+                                key={order.id}
                                 className="group flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-gray-100 rounded-2xl bg-white hover:border-indigo-100 hover:shadow-lg hover:shadow-indigo-50/40 transition-all duration-300"
                             >
                                 <div className="flex items-start gap-4">
@@ -263,7 +263,7 @@ export default function ProfilePage() {
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2 mb-1">
                                             <span className="font-bold text-gray-900 text-sm">
-                                                #{order._id.slice(-6).toUpperCase()}
+                                                #{order.id.slice(-6).toUpperCase()}
                                             </span>
                                             <span
                                                 className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wide border ${
@@ -294,7 +294,7 @@ export default function ProfilePage() {
                                         {order.total ? `₹${order.total}` : ""}
                                     </span>
                                     <button
-                                        onClick={() => navigate(`/orders/${order._id}`)}
+                                        onClick={() => navigate(`/orders/${order.id}`)}
                                         className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-colors"
                                     >
                                         Details <ChevronRight size={16} />
@@ -336,7 +336,7 @@ export default function ProfilePage() {
                     {userAddresses.length > 0 ? (
                         userAddresses.map((addr, index) => (
                             <div
-                                key={addr._id || index}
+                                key={addr.id || index}
                                 className="p-5 border border-gray-200 rounded-2xl bg-white hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-50/40 transition-all duration-300 group"
                             >
                                 <div className="flex justify-between items-start mb-3">

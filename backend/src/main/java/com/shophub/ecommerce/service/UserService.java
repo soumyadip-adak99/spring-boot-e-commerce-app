@@ -122,7 +122,7 @@ public class UserService {
         for (CartItem cartItem : user.getCartItems()) {
             productRepository.findById(cartItem.getProductId()).ifPresent(product -> {
                 Map<String, Object> itemMap = new HashMap<>();
-                itemMap.put("_id", product.getId());
+                itemMap.put("id", product.getId());
                 itemMap.put("product_name", product.getProductName());
                 itemMap.put("product_description", product.getProductDescription());
                 itemMap.put("price", product.getPrice());
@@ -148,22 +148,52 @@ public class UserService {
         for (String orderId : user.getOrders()) {
             orderRepository.findById(orderId).ifPresent(order -> {
                 Map<String, Object> orderMap = new LinkedHashMap<>();
-                orderMap.put("_id", order.getId());
+                orderMap.put("id", order.getId());
                 orderMap.put("payment_status", order.getPaymentStatus());
                 orderMap.put("payment_mode", order.getPaymentMode());
                 orderMap.put("quantity", order.getQuantity());
                 orderMap.put("createdAt", order.getCreatedAt());
 
-                // Resolve product details for the order
-                productRepository.findById(order.getProduct()).ifPresent(product -> {
-                    orderMap.put("product_id", product.getId());
-                    orderMap.put("product_name", product.getProductName());
-                    orderMap.put("product_description", product.getProductDescription());
-                    orderMap.put("price", product.getPrice());
-                    orderMap.put("image", product.getImage());
-                    orderMap.put("status", product.getStatus());
-                    orderMap.put("category", product.getCategory());
-                });
+                // Resolve product details for the order (Support both single and multi-item)
+                List<Map<String, Object>> itemsDetails = new ArrayList<>();
+                if (order.getOrderItems() != null && !order.getOrderItems().isEmpty()) {
+                    for (OrderItem item : order.getOrderItems()) {
+                        productRepository.findById(item.getProductId()).ifPresent(product -> {
+                            Map<String, Object> prodMap = new HashMap<>();
+                            prodMap.put("product_id", product.getId());
+                            prodMap.put("product_name", product.getProductName());
+                            prodMap.put("product_description", product.getProductDescription());
+                            prodMap.put("price", item.getPrice()); // Use price from order time
+                            prodMap.put("current_price", product.getPrice());
+                            prodMap.put("image", product.getImage());
+                            prodMap.put("status", product.getStatus());
+                            prodMap.put("category", product.getCategory());
+                            prodMap.put("quantity", item.getQuantity());
+                            itemsDetails.add(prodMap);
+                        });
+                    }
+                } else if (order.getProduct() != null) {
+                    // Fallback for legacy orders
+                    productRepository.findById(order.getProduct()).ifPresent(product -> {
+                        Map<String, Object> prodMap = new HashMap<>();
+                        prodMap.put("product_id", product.getId());
+                        prodMap.put("product_name", product.getProductName());
+                        prodMap.put("product_description", product.getProductDescription());
+                        prodMap.put("price", product.getPrice());
+                        prodMap.put("image", product.getImage());
+                        prodMap.put("status", product.getStatus());
+                        prodMap.put("category", product.getCategory());
+                        prodMap.put("quantity", order.getQuantity());
+                        itemsDetails.add(prodMap);
+                    });
+                }
+
+                // For backward compatibility for frontend that expects flat product structure
+                if (!itemsDetails.isEmpty()) {
+                    Map<String, Object> firstItem = itemsDetails.get(0);
+                    orderMap.putAll(firstItem); // Flatten first item details into orderMap
+                    orderMap.put("items", itemsDetails); // Also provide full list
+                }
 
                 // Resolve address details for the order
                 if (order.getAddress() != null) {
@@ -281,7 +311,7 @@ public class UserService {
 
     private Map<String, Object> getUserSafeMap(User user) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("_id", user.getId());
+        map.put("id", user.getId());
         map.put("first_name", user.getFirstName());
         map.put("last_name", user.getLastName());
         map.put("email", user.getEmail());
