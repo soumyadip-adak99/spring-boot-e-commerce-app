@@ -1,0 +1,97 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: shophub-ecommerce
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE}
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      timeout: 5000ms
+
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SECURITY_OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${SECURITY_OAUTH2_GOOGLE_CLIENT_ID}
+            scope: openid, profile, email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+      cache-null-values: false
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: true
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiry: ${JWT_TIMEOUT}
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+
+# Razorpay Configuration
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:5174
+
+# Logging
+logging:
+  level:
+    com.shophub.ecommerce: INFO
+    org.springframework.security: WARN
+    org.springframework.data.mongodb: WARN
+    org.springframework.cache: WARN
