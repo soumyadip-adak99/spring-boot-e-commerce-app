@@ -10,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.shophub.ecommerce.enums.PaymentStatus;
+
 import java.util.List;
 import java.io.Serializable;
 import java.time.Instant;
@@ -25,7 +27,7 @@ public class Order implements Serializable {
     private String id;
 
     @Field("payment_status")
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     @Field("payment_mode")
     private String paymentMode;

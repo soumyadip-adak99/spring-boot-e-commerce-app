@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.shophub.ecommerce.enums.ProductStatus;
 
 import java.time.Instant;
 
@@ -30,7 +31,8 @@ public class ProductResponse {
     private String image;
 
     @JsonProperty("status")
-    private String status = "IN_STOCK";
+    @Builder.Default
+    private ProductStatus status = ProductStatus.IN_STOCK;
 
     @JsonProperty("category")
     private String category;

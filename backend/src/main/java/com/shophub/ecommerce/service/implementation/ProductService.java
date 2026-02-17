@@ -1,10 +1,12 @@
-package com.shophub.ecommerce.service;
+package com.shophub.ecommerce.service.implementation;
 
 import com.shophub.ecommerce.dto.ProductResponse;
 import com.shophub.ecommerce.exception.ApiException;
 import com.shophub.ecommerce.mapper.ProductMapper;
 import com.shophub.ecommerce.model.Product;
+import com.shophub.ecommerce.enums.ProductStatus;
 import com.shophub.ecommerce.repository.ProductRepository;
+import com.shophub.ecommerce.service.CloudinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,14 +42,14 @@ public class ProductService {
 
     @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
     public Product addProduct(String productName, String productDescription, double price,
-            String status, String category, MultipartFile image) throws IOException {
+            ProductStatus status, String category, MultipartFile image) throws IOException {
         String imageUrl = cloudinaryService.uploadImage(image, "products");
 
         Product product = Product.builder()
                 .productName(productName)
                 .productDescription(productDescription)
                 .price(price)
-                .status(status != null ? status : "IN_STOCK")
+                .status(status != null ? status : ProductStatus.IN_STOCK)
                 .category(category)
                 .image(imageUrl)
                 .build();
@@ -57,7 +59,7 @@ public class ProductService {
 
     @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
     public Product updateProduct(String id, String productName, String productDescription,
-            Double price, String image, String status, String category) {
+            Double price, String image, ProductStatus status, String category) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
 
@@ -73,7 +75,7 @@ public class ProductService {
         if (image != null && !image.trim().isEmpty()) {
             product.setImage(image);
         }
-        if (status != null && !status.trim().isEmpty()) {
+        if (status != null) {
             product.setStatus(status);
         }
         if (category != null && !category.trim().isEmpty()) {

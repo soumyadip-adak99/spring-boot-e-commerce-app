@@ -1,4 +1,4 @@
-package com.shophub.ecommerce.service;
+package com.shophub.ecommerce.service.implementation;
 
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;

@@ -2,7 +2,7 @@ package com.shophub.ecommerce.controller;
 
 import com.shophub.ecommerce.dto.ApiResponse;
 import com.shophub.ecommerce.model.Product;
-import com.shophub.ecommerce.service.ProductService;
+import com.shophub.ecommerce.service.implementation.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,6 @@ public class ProductController {
 
     @GetMapping("/get-by-id/{id}")
     public ResponseEntity<ApiResponse> getProductById(@PathVariable String id) {
-        System.out.println(id);
         Product product = productService.getProductById(id);
         return ResponseEntity.ok(ApiResponse.success("Product fetched", product));
     }

@@ -38,7 +38,7 @@ spring:
         registration:
           google:
             client-id: ${SECURITY_OAUTH2_GOOGLE_CLIENT_ID}
-            client-secret: ${SECURITY_OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${SECURITY_OAUTH2_GOOGLE_CLIENT_SECRET}
             scope: openid, profile, email
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:

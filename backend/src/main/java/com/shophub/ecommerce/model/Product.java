@@ -11,6 +11,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import com.shophub.ecommerce.enums.ProductStatus;
+
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -37,7 +39,7 @@ public class Product implements Serializable {
     private String image;
 
     @Builder.Default
-    private String status = "IN_STOCK";
+    private ProductStatus status = ProductStatus.IN_STOCK;
 
     private String category;
 

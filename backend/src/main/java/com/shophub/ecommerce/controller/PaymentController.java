@@ -5,8 +5,9 @@ import com.shophub.ecommerce.dto.PaymentVerifyRequest;
 import com.shophub.ecommerce.model.User;
 import com.shophub.ecommerce.exception.ApiException;
 import com.shophub.ecommerce.service.OrderService;
-import com.shophub.ecommerce.service.ProductService;
-import com.shophub.ecommerce.service.RazorpayService;
+import com.shophub.ecommerce.service.implementation.ProductService;
+import com.shophub.ecommerce.service.implementation.RazorpayService;
+import com.shophub.ecommerce.enums.PaymentStatus;
 import com.razorpay.Order;
 import com.razorpay.RazorpayException;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +80,7 @@ public class PaymentController {
             var order = orderService.createOrder(
                     user.getEmail(),
                     request.getProduct_id(),
-                    "PAID",
+                    PaymentStatus.SUCCESS,
                     "ONLINE",
                     request.getAddress_id(),
                     request.getQuantity() > 0 ? request.getQuantity() : 1,

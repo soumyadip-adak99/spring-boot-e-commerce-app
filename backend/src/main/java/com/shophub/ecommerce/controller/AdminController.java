@@ -2,9 +2,10 @@ package com.shophub.ecommerce.controller;
 
 import com.shophub.ecommerce.dto.ApiResponse;
 import com.shophub.ecommerce.model.Product;
+import com.shophub.ecommerce.enums.ProductStatus;
 import com.shophub.ecommerce.service.OrderService;
-import com.shophub.ecommerce.service.ProductService;
-import com.shophub.ecommerce.service.UserService;
+import com.shophub.ecommerce.service.implementation.ProductService;
+import com.shophub.ecommerce.service.implementation.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,8 +43,10 @@ public class AdminController {
             @RequestParam(value = "category", required = false) String category,
             @RequestParam("image") MultipartFile image) throws IOException {
 
+        ProductStatus productStatus = status != null ? ProductStatus.valueOf(status) : ProductStatus.IN_STOCK;
+
         Product product = productService.addProduct(
-                productName, productDescription, price, status, category, image);
+                productName, productDescription, price, productStatus, category, image);
         return ResponseEntity.ok(ApiResponse.success("Product added successfully", product));
     }
 
@@ -57,8 +60,13 @@ public class AdminController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "category", required = false) String category) {
 
+        ProductStatus productStatus = null;
+        if (status != null && !status.trim().isEmpty()) {
+            productStatus = ProductStatus.valueOf(status);
+        }
+
         Product product = productService.updateProduct(
-                id, productName, productDescription, price, image, status, category);
+                id, productName, productDescription, price, image, productStatus, category);
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", product));
     }
 

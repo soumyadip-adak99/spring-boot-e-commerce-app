@@ -1,4 +1,4 @@
-package com.shophub.ecommerce.service;
+package com.shophub.ecommerce.service.implementation;
 
 import com.shophub.ecommerce.exception.ApiException;
 import com.shophub.ecommerce.model.*;
@@ -6,6 +6,8 @@ import com.shophub.ecommerce.repository.AddressRepository;
 import com.shophub.ecommerce.repository.OrderRepository;
 import com.shophub.ecommerce.repository.ProductRepository;
 import com.shophub.ecommerce.repository.UserRepository;
+import com.shophub.ecommerce.service.EmailService;
+import com.shophub.ecommerce.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
