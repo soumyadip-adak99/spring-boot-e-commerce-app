@@ -40,8 +40,7 @@ public class RazorpayServiceImpl implements RazorpayService {
     }
 
     @Override
-    public boolean verifyPaymentSignature(String orderId, String paymentId, String signature)
-            throws RazorpayException {
+    public boolean verifyPaymentSignature(String orderId, String paymentId, String signature) throws RazorpayException {
         JSONObject attributes = new JSONObject();
         attributes.put("razorpay_order_id", orderId);
         attributes.put("razorpay_payment_id", paymentId);

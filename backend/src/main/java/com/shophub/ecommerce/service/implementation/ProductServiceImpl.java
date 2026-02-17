@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final CloudinaryService cloudinaryService;
     private final ProductMapper productMapper;
 
-    @Cacheable(value = "allProducts_v2")
+    // @Cacheable(value = "allProducts_v2")
     @Override
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cacheable(value = "products_v2", key = "#id")
+    //@Cacheable(value = "products_v2", key = "#id")
     public Product getProductById(String id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
