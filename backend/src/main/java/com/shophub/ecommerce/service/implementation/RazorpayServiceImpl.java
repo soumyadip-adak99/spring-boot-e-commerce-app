@@ -4,6 +4,8 @@ import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
+import com.shophub.ecommerce.service.RazorpayService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -12,8 +14,9 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Getter
 @RequiredArgsConstructor
-public class RazorpayService {
+public class RazorpayServiceImpl implements RazorpayService {
 
     private final RazorpayClient razorpayClient;
 
@@ -23,6 +26,7 @@ public class RazorpayService {
     @Value("${razorpay.key-secret}")
     private String keySecret;
 
+    @Override
     public Order createOrder(double amount, String currency, String receipt) throws RazorpayException {
         JSONObject orderRequest = new JSONObject();
         orderRequest.put("amount", (int) (amount * 100)); // Convert to paise
@@ -35,6 +39,7 @@ public class RazorpayService {
         return order;
     }
 
+    @Override
     public boolean verifyPaymentSignature(String orderId, String paymentId, String signature)
             throws RazorpayException {
         JSONObject attributes = new JSONObject();
@@ -43,9 +48,5 @@ public class RazorpayService {
         attributes.put("razorpay_signature", signature);
 
         return Utils.verifyPaymentSignature(attributes, keySecret);
-    }
-
-    public String getKeyId() {
-        return keyId;
     }
 }

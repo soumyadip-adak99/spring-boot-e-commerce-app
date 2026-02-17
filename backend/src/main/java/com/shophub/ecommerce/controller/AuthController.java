@@ -2,7 +2,7 @@ package com.shophub.ecommerce.controller;
 
 import com.shophub.ecommerce.dto.ApiResponse;
 import com.shophub.ecommerce.model.User;
-import com.shophub.ecommerce.service.implementation.UserService;
+import com.shophub.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;

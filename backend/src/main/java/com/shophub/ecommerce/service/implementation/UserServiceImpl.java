@@ -8,6 +8,7 @@ import com.shophub.ecommerce.repository.ProductRepository;
 import com.shophub.ecommerce.repository.UserRepository;
 import com.shophub.ecommerce.service.EmailService;
 import com.shophub.ecommerce.service.JwtService;
+import com.shophub.ecommerce.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -32,7 +33,7 @@ public class UserService {
     private final JwtService jwtService;
     private final EmailService emailService;
 
-    public User registerUser(String firstName, String lastName, String email, String password) {
+    public void registerUser(String firstName, String lastName, String email, String password) {
         if (userRepository.existsByEmail(email)) {
             throw new ApiException(HttpStatus.CONFLICT, "User with email already exists.");
         }
@@ -49,12 +50,10 @@ public class UserService {
                 .orders(new ArrayList<>())
                 .build();
 
-        user = userRepository.save(user);
+         userRepository.save(user);
 
         // Send welcome email asynchronously
         emailService.sendWelcomeEmail(email, firstName + " " + lastName);
-
-        return user;
     }
 
     public Map<String, Object> loginUser(String email, String password) {
@@ -279,7 +278,7 @@ public class UserService {
 
     @CacheEvict(value = "userDetails_v2", key = "#email")
     public Map<String, Object> updateProfile(String email, String firstName, String lastName,
-            String profileImage) {
+                                             String profileImage) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
 

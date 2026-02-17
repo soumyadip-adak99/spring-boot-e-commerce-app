@@ -2,7 +2,7 @@ package com.shophub.ecommerce.controller;
 
 import com.shophub.ecommerce.dto.ApiResponse;
 import com.shophub.ecommerce.model.Product;
-import com.shophub.ecommerce.service.implementation.ProductService;
+import com.shophub.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

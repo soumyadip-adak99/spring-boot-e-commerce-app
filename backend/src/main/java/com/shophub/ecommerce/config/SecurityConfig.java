@@ -34,14 +34,16 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.getWriter().write(
                                     objectMapper.writeValueAsString(
-                                            ApiResponse.error("Unauthorized: Please login to access this resource")));
+                                            ApiResponse.error(
+                                                    "Unauthorized: Please login to access this resource")));
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -52,6 +54,9 @@ public class SecurityConfig {
                         }))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
+                        .requestMatchers("/api/v1/swagger-ui.html", "/api/v1/swagger-ui/**",
+                                "/api/v1/v3/api-docs/**", "/swagger-ui/**")
+                        .permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/health-check/**").permitAll()
                         .requestMatchers("/api/v1/product/**").permitAll()

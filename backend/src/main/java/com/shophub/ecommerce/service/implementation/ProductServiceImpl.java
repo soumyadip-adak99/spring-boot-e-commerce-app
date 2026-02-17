@@ -7,9 +7,11 @@ import com.shophub.ecommerce.model.Product;
 import com.shophub.ecommerce.enums.ProductStatus;
 import com.shophub.ecommerce.repository.ProductRepository;
 import com.shophub.ecommerce.service.CloudinaryService;
+import com.shophub.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,13 +22,14 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CloudinaryService cloudinaryService;
     private final ProductMapper productMapper;
 
-    // @Cacheable(value = "allProducts_v2")
+    @Cacheable(value = "allProducts_v2")
+    @Override
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream()
@@ -34,15 +37,17 @@ public class ProductService {
                 .toList();
     }
 
-    // @Cacheable(value = "products_v2", key = "#id")
+    @Override
+    @Cacheable(value = "products_v2", key = "#id")
     public Product getProductById(String id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
-    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
+    @Override
+    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
     public Product addProduct(String productName, String productDescription, double price,
-            ProductStatus status, String category, MultipartFile image) throws IOException {
+                              ProductStatus status, String category, MultipartFile image) throws IOException {
         String imageUrl = cloudinaryService.uploadImage(image, "products");
 
         Product product = Product.builder()
@@ -57,9 +62,10 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
+    @Override
+    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
     public Product updateProduct(String id, String productName, String productDescription,
-            Double price, String image, ProductStatus status, String category) {
+                                 Double price, String image, ProductStatus status, String category) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
 
@@ -85,7 +91,8 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
+    @Override
+    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
     public Product deleteProduct(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
