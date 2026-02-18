@@ -72,6 +72,13 @@ public class PublicController {
 
         @GetMapping("/get-all-products")
         public ResponseEntity<ApiResponse> getAllProducts() {
-                return ResponseEntity.ok(ApiResponse.success("Products fetched successfully", productService.getAllProducts()));
+                return ResponseEntity.ok(
+                                ApiResponse.success("Products fetched successfully", productService.getAllProducts()));
+        }
+
+        @GetMapping("/search")
+        public ResponseEntity<ApiResponse> searchProducts(@RequestParam String keyword) {
+                return ResponseEntity.ok(ApiResponse.success("Search results fetched successfully",
+                                productService.searchProducts(keyword)));
         }
 }

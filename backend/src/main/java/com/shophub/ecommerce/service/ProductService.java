@@ -15,12 +15,13 @@ public interface ProductService {
     Product getProductById(String id);
 
     Product addProduct(String productName, String productDescription,
-                       double price, ProductStatus status, String category,
-                       MultipartFile image
-    ) throws IOException;
+            double price, ProductStatus status, String category,
+            MultipartFile image) throws IOException;
 
     Product updateProduct(String id, String productName, String productDescription,
-                          Double price, String image, ProductStatus status, String category);
+            Double price, String image, ProductStatus status, String category);
 
     Product deleteProduct(String id);
+
+    List<ProductResponse> searchProducts(String keyword);
 }

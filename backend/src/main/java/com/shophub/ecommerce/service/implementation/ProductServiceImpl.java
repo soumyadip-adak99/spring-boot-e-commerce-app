@@ -11,7 +11,6 @@ import com.shophub.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,16 +37,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    //@Cacheable(value = "products_v2", key = "#id")
+    // @Cacheable(value = "products_v2", key = "#id")
     public Product getProductById(String id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
     }
 
     @Override
-    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
+    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
     public Product addProduct(String productName, String productDescription, double price,
-                              ProductStatus status, String category, MultipartFile image) throws IOException {
+            ProductStatus status, String category, MultipartFile image) throws IOException {
         String imageUrl = cloudinaryService.uploadImage(image, "products");
 
         Product product = Product.builder()
@@ -63,9 +62,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
+    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
     public Product updateProduct(String id, String productName, String productDescription,
-                                 Double price, String image, ProductStatus status, String category) {
+            Double price, String image, ProductStatus status, String category) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
 
@@ -92,11 +91,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CacheEvict(value = {"allProducts_v2", "products_v2"}, allEntries = true)
+    @CacheEvict(value = { "allProducts_v2", "products_v2" }, allEntries = true)
     public Product deleteProduct(String id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Product not found"));
         productRepository.delete(product);
         return product;
+    }
+
+    @Override
+    public List<ProductResponse> searchProducts(String keyword) {
+        List<Product> products = productRepository.findByProductNameContainingIgnoreCase(keyword);
+        return products.stream()
+                .map(productMapper::toProductResponse)
+                .toList();
     }
 }

@@ -10,7 +10,6 @@ import com.shophub.ecommerce.service.RazorpayService;
 import com.shophub.ecommerce.enums.PaymentStatus;
 import com.razorpay.Order;
 import com.razorpay.RazorpayException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

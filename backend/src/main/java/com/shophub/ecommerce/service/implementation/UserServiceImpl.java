@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final EmailService emailService;
 
+    @Override
     public void registerUser(String firstName, String lastName, String email, String password) {
         if (userRepository.existsByEmail(email)) {
             throw new ApiException(HttpStatus.CONFLICT, "User with email already exists.");
@@ -56,6 +57,7 @@ public class UserServiceImpl implements UserService {
         emailService.sendWelcomeEmail(email, firstName + " " + lastName);
     }
 
+    @Override
     public Map<String, Object> loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -79,6 +81,7 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
     public Map<String, Object> adminLogin(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found."));
@@ -106,12 +109,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @CacheEvict(value = "userDetails_v2", key = "#user.email")
+    @Override
     public void logoutUser(User user) {
         user.setJwtToken(null);
         userRepository.save(user);
     }
 
     @Cacheable(value = "userDetails_v2", key = "#email")
+    @Override
     public Map<String, Object> getUserDetails(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -213,6 +218,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @CacheEvict(value = "userDetails_v2", key = "#email")
+    @Override
     public Map<String, Object> addToCart(String email, String productId) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -238,6 +244,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @CacheEvict(value = "userDetails_v2", key = "#email")
+    @Override
     public Map<String, Object> updateCartQuantity(String email, String productId, int quantity) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
@@ -267,6 +274,7 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
     @CacheEvict(value = "userDetails_v2", key = "#email")
     public void deleteCartItem(String email, String productId) {
         User user = userRepository.findByEmail(email)
@@ -276,6 +284,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
     @CacheEvict(value = "userDetails_v2", key = "#email")
     public Map<String, Object> updateProfile(String email, String firstName, String lastName,
                                              String profileImage) {
@@ -298,12 +307,14 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
     public List<Map<String, Object>> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::getUserSafeMap)
                 .collect(Collectors.toList());
     }
 
+    @Override
     public void deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));

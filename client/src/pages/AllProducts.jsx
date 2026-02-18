@@ -11,7 +11,7 @@ import {
 
 import CategoryFilter from "../components/CategoryFilter";
 import ProductCard from "../components/ProductCard";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../sections/Navbar";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +22,8 @@ import toast from "react-hot-toast";
 export default function AllProducts() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchQuery = searchParams.get("search");
 
     const productState = useSelector((state) => state.product);
     const { products, isLoading, isError } = productState || {
@@ -78,6 +80,12 @@ export default function AllProducts() {
     const filteredProducts = useMemo(() => {
         let result = safeProducts;
 
+        if (searchQuery) {
+            result = result.filter((p) => 
+                p.product_name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
         if (selectedCategory !== "All") {
             result = result.filter((p) => p.category === selectedCategory);
         }
@@ -94,7 +102,7 @@ export default function AllProducts() {
             default:
                 return result;
         }
-    }, [safeProducts, selectedCategory, maxPrice, sortOption]);
+    }, [safeProducts, selectedCategory, maxPrice, sortOption, searchQuery]);
 
     useEffect(() => {
         if (priceRange.max !== 1000) setMaxPrice(priceRange.max);
@@ -130,13 +138,13 @@ export default function AllProducts() {
                         <span>Shop</span>
                         <ChevronRight size={14} className="mx-2 text-gray-300" />
                         <span className="font-medium text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md">
-                            {selectedCategory === "All" ? "All Products" : selectedCategory}
+                            {searchQuery ? `Search: "${searchQuery}"` : (selectedCategory === "All" ? "All Products" : selectedCategory)}
                         </span>
                     </nav>
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                            {selectedCategory === "All" ? "All Products" : selectedCategory}
+                            {searchQuery ? `Search Results for "${searchQuery}"` : (selectedCategory === "All" ? "All Products" : selectedCategory)}
                         </h1>
 
                         <div className="flex items-center gap-3">
@@ -214,14 +222,16 @@ export default function AllProducts() {
                                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
                                     No matches found
                                 </h3>
+                                <p className="text-gray-500 mb-6">Try checking your spelling or use different keywords.</p>
                                 <button
                                     onClick={() => {
                                         setSelectedCategory("All");
                                         setMaxPrice(priceRange.max);
+                                        navigate("/products"); // Clear search
                                     }}
                                     className="px-6 py-3 bg-gray-900 text-white rounded-xl mt-4 hover:bg-gray-800"
                                 >
-                                    Clear all filters
+                                    Clear all filters & search
                                 </button>
                             </div>
                         ) : (
