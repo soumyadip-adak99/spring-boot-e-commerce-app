@@ -1,63 +1,60 @@
 import React from "react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function CartItemsModal({ userCartItems, totalPrice }) {
     const navigate = useNavigate();
 
     return (
-        <div className="absolute right-0 mt-3 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 ring-1 ring-black/5">
-            <div className="px-5 py-4 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
-                <h3 className="font-semibold text-gray-900 text-sm">Shopping Cart</h3>
-                <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full">
-                    {userCartItems.length} Items
+        <div className="absolute right-0 mt-6 w-96 bg-[#0a0a0a] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+            <div className="px-6 py-5 border-b border-white/5 bg-[#050505] flex justify-between items-center">
+                <h3 className="museo-headline text-white tracking-widest text-lg">CART</h3>
+                <span className="museo-label text-[9px] text-white/40 tracking-[0.2em] uppercase border border-white/10 px-3 py-1">
+                    {userCartItems.length} ITEMS
                 </span>
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-96 overflow-y-auto custom-scrollbar">
                 {userCartItems.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-                        <div className="bg-gray-50 p-4 rounded-full mb-3 text-gray-300">
-                            <ShoppingBag size={40} strokeWidth={1.5} />
+                    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+                        <div className="mb-6 text-white/20">
+                            <ShoppingBag size={48} strokeWidth={1} />
                         </div>
-                        <p className="text-gray-900 font-medium">Your cart is empty</p>
-                        <p className="text-xs text-gray-500 mt-1 max-w-[200px]">
-                            Looks like you haven't added anything to your cart yet.
+                        <p className="museo-headline text-white text-xl mb-2 tracking-wide">Empty Cart</p>
+                        <p className="museo-body text-xs text-white/40 max-w-[200px] leading-relaxed">
+                            No products have been added to your cart.
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-white/5">
                         {userCartItems.map((item) => (
                             <div
                                 key={item.id || Math.random()}
-                                className="flex items-center gap-4 p-4 hover:bg-gray-50/80 transition-colors group"
+                                className="flex items-center gap-6 p-6 hover:bg-white/5 transition-colors group"
                             >
-                                <div className="h-12 w-12 shrink-0 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 group-hover:border-indigo-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                <div className="h-16 w-16 shrink-0 bg-[#050505] border border-white/10 flex items-center justify-center text-white/20 group-hover:border-white/30 transition-colors">
                                     {item.image ? (
                                         <img
                                             src={item.image}
                                             alt={item.product_name}
-                                            className="h-full w-full object-cover rounded-lg"
+                                            className="h-full w-full object-contain transition-all duration-500 hover:scale-105"
                                         />
                                     ) : (
-                                        <ShoppingBag size={18} />
+                                        <ShoppingBag size={20} strokeWidth={1.5} />
                                     )}
                                 </div>
 
-                                <div className="flex-1 min-w-0">
-                                    <h4 className="text-sm font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors">
-                                        {item.product_name || item.name || "Product"}
+                                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                    <h4 className="museo-headline text-base text-white truncate mb-1">
+                                        {item.product_name || item.name || "UNNAMED PRODUCT"}
                                     </h4>
-                                    <p className="text-xs text-gray-500 mt-0.5">
-                                        Qty:{" "}
-                                        <span className="font-medium text-gray-700">
-                                            {item.quantity || 1}
-                                        </span>
+                                    <p className="museo-label text-[9px] text-white/40 tracking-[0.2em] uppercase mt-2">
+                                        QTY: {item.quantity || 1}
                                     </p>
                                 </div>
 
                                 <div className="text-right">
-                                    <p className="text-sm font-bold text-gray-900">
+                                    <p className="museo-headline text-lg text-white tracking-wide">
                                         ₹{(item.price || 0).toLocaleString()}
                                     </p>
                                 </div>
@@ -68,22 +65,23 @@ export default function CartItemsModal({ userCartItems, totalPrice }) {
             </div>
 
             {userCartItems.length > 0 && (
-                <div className="p-5 bg-gray-50/50 border-t border-gray-100">
-                    <div className="flex justify-between items-end mb-4">
+                <div className="p-6 bg-[#050505] border-t border-white/5">
+                    <div className="flex justify-between items-end mb-6">
                         <div>
-                            <span className="block text-xs text-gray-900 mb-1">Subtotal</span>
-                            <p className="text-xs text-gray-800">Shipping calculated at checkout</p>
+                            <span className="block museo-label text-[10px] text-white/40 tracking-[0.2em] uppercase mb-1">SUBTOTAL</span>
+                            <p className="museo-body text-[10px] text-white/30 italic">Shipping calculated at checkout</p>
                         </div>
-                        <span className="text-xl font-bold text-gray-900 tracking-tight">
+                        <span className="museo-headline text-2xl text-white tracking-widest">
                             ₹{totalPrice.toLocaleString()}
                         </span>
                     </div>
 
                     <button
                         onClick={() => navigate("/cart")}
-                        className="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-indigo-200 active:scale-[0.98]"
+                        className="w-full flex items-center justify-center gap-3 bg-transparent hover:bg-white text-white hover:text-black py-4 border border-white/20 transition-all active:scale-[0.98] museo-label text-[10px] tracking-[0.2em] uppercase group"
                     >
-                        View Cart & Checkout
+                        PROCEED TO CHECKOUT
+                        <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>
             )}

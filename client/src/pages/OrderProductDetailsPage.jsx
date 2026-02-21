@@ -1,20 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-    ArrowLeft,
-    Calendar,
-    MapPin,
-    Package,
-    Truck,
-    CheckCircle,
-    Clock,
-    Download,
-    HelpCircle,
-    ShoppingBag,
-    CreditCard,
-    Tag,
-    Phone,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Package, Download, ShoppingBag, Phone, Mail } from "lucide-react";
 
 export default function OrderProductDetailsPage() {
     const { orderId } = useParams();
@@ -32,7 +18,7 @@ export default function OrderProductDetailsPage() {
         if (!dateString) return "N/A";
         return new Date(dateString).toLocaleDateString("en-IN", {
             year: "numeric",
-            month: "long",
+            month: "short",
             day: "numeric",
             hour: "2-digit",
             minute: "2-digit",
@@ -41,14 +27,14 @@ export default function OrderProductDetailsPage() {
 
     if (!order) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <Package className="h-16 w-16 text-gray-300 mb-4" />
-                <h2 className="text-xl font-bold text-gray-900">Order not found</h2>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] relative z-10 text-white">
+                <Package className="h-16 w-16 text-white/20 mb-6" />
+                <h2 className="museo-headline text-2xl tracking-wide">ORDER NOT FOUND</h2>
                 <button
                     onClick={() => navigate(-1)}
-                    className="mt-4 text-indigo-600 hover:underline font-medium"
+                    className="mt-6 museo-label text-[10px] tracking-widest text-[#ea0000] border-b border-transparent hover:border-[#ea0000] transition-colors"
                 >
-                    Go back to Profile
+                    RETURN TO ORDERS
                 </button>
             </div>
         );
@@ -62,11 +48,11 @@ export default function OrderProductDetailsPage() {
         if (status === "Delivered") currentStep = 3;
 
         return (
-            <div className="w-full py-6">
-                <div className="relative flex items-center justify-between w-full">
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0 rounded-full"></div>
+            <div className="w-full py-8 border-t border-b border-white/5 my-8">
+                <div className="relative flex items-center justify-between w-full max-w-2xl mx-auto">
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-[1px] bg-white/10 z-0"></div>
                     <div
-                        className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-indigo-600 transition-all duration-500 z-0 rounded-full"
+                        className="absolute left-0 top-1/2 transform -translate-y-1/2 h-[1px] bg-white transition-all duration-700 z-0"
                         style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
                     ></div>
 
@@ -75,19 +61,20 @@ export default function OrderProductDetailsPage() {
                         const isCurrent = index === currentStep;
 
                         return (
-                            <div key={step} className="flex flex-col items-center z-10">
+                            <div
+                                key={step}
+                                className="flex flex-col items-center z-10 relative bg-[#0a0a0a] px-2 p-1"
+                            >
                                 <div
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                                    className={`w-3 h-3 flex items-center justify-center transition-all duration-500 mb-2 ${
                                         isCompleted
-                                            ? "bg-indigo-600 border-indigo-600 text-white"
-                                            : "bg-white border-gray-300 text-gray-300"
+                                            ? "bg-white"
+                                            : "bg-transparent border border-white/20"
                                     }`}
-                                >
-                                    {isCompleted ? <CheckCircle size={14} /> : <Clock size={14} />}
-                                </div>
+                                />
                                 <span
-                                    className={`text-[10px] sm:text-xs font-semibold mt-2 absolute -bottom-6 w-24 text-center ${
-                                        isCurrent ? "text-indigo-700" : "text-gray-500"
+                                    className={`museo-label text-[8px] absolute -bottom-5 text-center uppercase tracking-[0.2em] transition-colors w-20 ${
+                                        isCurrent ? "text-white" : "text-white/40"
                                     }`}
                                 >
                                     {step}
@@ -101,152 +88,151 @@ export default function OrderProductDetailsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50/50 font-sans pb-20">
-            <div className="bg-indigo-600 h-64 w-full relative overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-indigo-600 to-violet-800 opacity-90" />
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] bg-size-[16px_16px]"></div>
+        <div className="min-h-screen bg-[#050505] text-white font-sans pb-32 relative z-10 overflow-x-hidden selection:bg-[#ea0000] selection:text-white">
+            <div className="bg-[#050505] h-64 w-full relative overflow-hidden border-b border-white/5">
+                <div className="noise-overlay" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mix-blend-difference pointer-events-none">
+                    <h1 className="text-[12vw] font-medium text-white/90 tracking-tighter leading-none museo-headline opacity-10">
+                        {order.id.slice(-6).toUpperCase()}
+                    </h1>
+                </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-52 relative z-10">
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 -mt-24 relative z-20">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-white/90 hover:text-white mb-6 hover:bg-white/10 w-fit px-3 py-1.5 rounded-full transition-all"
+                    className="flex items-center gap-3 text-white/40 hover:text-white transition-colors museo-label text-[10px] tracking-widest uppercase pb-1 border-b border-transparent hover:border-white mb-12 w-fit bg-[#050505] px-2 py-1"
                 >
-                    <ArrowLeft size={18} /> Back to Orders
+                    <ArrowLeft size={12} /> BACK TO ORDERS
                 </button>
 
-                <div className="flex flex-col lg:flex-row gap-6">
-                    <div className="flex-1 space-y-6">
-                        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div className="flex flex-col lg:flex-row gap-12">
+                    <div className="flex-1 space-y-12">
+                        <div className="bg-[#0a0a0a] border border-white/5 p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 gap-6">
                                 <div>
-                                    <div className="flex items-center gap-3">
-                                        <h1 className="text-2xl font-bold text-gray-900">
-                                            Order #{order.id.slice(-6).toUpperCase()}
-                                        </h1>
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
-                                                order.status === "Delivered"
-                                                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                                    : "bg-blue-50 text-blue-700 border-blue-100"
-                                            }`}
-                                        >
-                                            {order.status}
+                                    <h1 className="museo-headline text-3xl text-white tracking-widest mb-3">
+                                        ORDER{" "}
+                                        <span className="text-white/40">
+                                            #{order.id.slice(-6).toUpperCase()}
+                                        </span>
+                                    </h1>
+                                    <div className="flex items-center gap-4 text-white/40 museo-label text-[10px] tracking-widest uppercase mb-4">
+                                        <Calendar size={12} strokeWidth={1.5} />
+                                        <span>
+                                            INITIATED ON{" "}
+                                            {formatDate(
+                                                order.createdAt || new Date().toISOString()
+                                            )}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-gray-500 text-sm mt-1">
-                                        <Calendar size={14} />
-                                        Placed on{" "}
-                                        {formatDate(order.createdAt || new Date().toISOString())}
-                                    </div>
+                                    <span
+                                        className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border ${
+                                            order.status === "Delivered"
+                                                ? "bg-white text-black border-white"
+                                                : "bg-transparent text-white/60 border-white/20"
+                                        }`}
+                                    >
+                                        STATUS: {order.status}
+                                    </span>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl border border-gray-200 hover:bg-gray-100 transition-colors">
-                                        <Download size={16} /> Invoice
-                                    </button>
-                                    <button className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 text-sm font-semibold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-colors">
-                                        <Truck size={16} /> Track
+                                <div className="flex gap-4 w-full sm:w-auto">
+                                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-transparent text-white/60 hover:text-white museo-label text-[10px] tracking-widest uppercase border border-white/20 hover:border-white transition-colors">
+                                        <Download size={12} strokeWidth={1.5} /> INVOICE
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="mt-8 mb-4 px-2">
-                                <OrderStatusStepper status={order.status} />
-                            </div>
+                            <OrderStatusStepper status={order.status} />
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-                            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                                <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                                    <Package size={18} className="text-indigo-600" /> Order Items
-                                </h2>
-                            </div>
-                            <div className="p-6 divide-y divide-gray-100">
+                        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+                            <h2 className="museo-headline text-xl text-white tracking-widest mb-6 py-4 border-b border-white/5">
+                                ITEMS
+                            </h2>
+
+                            <div className="space-y-6">
                                 {order.items && order.items.length > 0 ? (
                                     order.items.map((item, index) => (
-                                        <div key={index} className="flex items-start gap-5 py-4 first:pt-0 last:pb-0">
-                                            <div className="h-24 w-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+                                        <div
+                                            key={index}
+                                            className="flex flex-col sm:flex-row items-start gap-8 bg-[#0a0a0a] border border-white/5 p-6 hover:border-white/20 transition-colors group"
+                                        >
+                                            <div className="h-32 w-32 bg-[#050505] border border-white/5 shrink-0 flex items-center justify-center p-4">
                                                 {item.image ? (
                                                     <img
                                                         src={item.image}
                                                         alt={item.product_name}
-                                                        className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                                                        className="h-full w-full object-contain transition-all duration-700 hover:scale-105"
                                                     />
                                                 ) : (
-                                                    <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                                        <ShoppingBag size={32} />
+                                                    <div className="text-white/20">
+                                                        <ShoppingBag size={24} strokeWidth={1} />
                                                     </div>
                                                 )}
                                             </div>
 
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mb-2">
-                                                            <Tag size={10} /> {item.category}
+                                            <div className="flex-1 w-full flex flex-col justify-between h-full pt-2">
+                                                <div>
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <span className="museo-label text-[9px] text-white/40 tracking-[0.2em] uppercase">
+                                                            {item.category}
                                                         </span>
-                                                        <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                                                            {item.product_name}
-                                                        </h3>
+                                                        <span className="museo-headline text-lg text-white">
+                                                            ₹{item.price.toLocaleString()}
+                                                        </span>
                                                     </div>
-                                                    <p className="font-bold text-gray-900 text-lg">
-                                                        ₹{item.price}
-                                                    </p>
+                                                    <h3 className="museo-headline text-xl text-white mb-2 decoration-white/30 truncate max-w-[90%]">
+                                                        {item.product_name}
+                                                    </h3>
                                                 </div>
 
-                                                <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
-                                                    {item.product_description ||
-                                                        "No description available."}
-                                                </p>
-
-                                                <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
-                                                    <span>Qty: {item.quantity || 1}</span>
-                                                    <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                                    <span className="font-mono">ID: {item.product_id}</span>
+                                                <div className="mt-8 flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest museo-label">
+                                                    <span>QTY: {item.quantity || 1}</span>
+                                                    <span className="w-[1px] h-3 bg-white/20"></span>
+                                                    <span>
+                                                        REF:{" "}
+                                                        {item.product_id.slice(-8).toUpperCase()}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="flex items-start gap-5">
-                                        <div className="h-24 w-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+                                    <div className="flex flex-col sm:flex-row items-start gap-8 bg-[#0a0a0a] border border-white/5 p-6 hover:border-white/20 transition-colors group">
+                                        <div className="h-32 w-32 bg-[#050505] border border-white/5 shrink-0 flex items-center justify-center p-4">
                                             {order.image ? (
                                                 <img
                                                     src={order.image}
                                                     alt={order.product_name}
-                                                    className="h-full w-full object-cover hover:scale-105 transition-transform duration-300"
+                                                    className="h-full w-full object-contain transition-all duration-700 hover:scale-105"
                                                 />
                                             ) : (
-                                                <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                                    <ShoppingBag size={32} />
+                                                <div className="text-white/20">
+                                                    <ShoppingBag size={24} strokeWidth={1} />
                                                 </div>
                                             )}
                                         </div>
 
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mb-2">
-                                                        <Tag size={10} /> {order.category}
+                                        <div className="flex-1 w-full flex flex-col justify-between h-full pt-2">
+                                            <div>
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="museo-label text-[9px] text-white/40 tracking-[0.2em] uppercase">
+                                                        {order.category}
                                                     </span>
-                                                    <h3 className="font-bold text-gray-900 text-lg leading-tight">
-                                                        {order.product_name}
-                                                    </h3>
+                                                    <span className="museo-headline text-lg text-white">
+                                                        ₹{order.price.toLocaleString()}
+                                                    </span>
                                                 </div>
-                                                <p className="font-bold text-gray-900 text-lg">
-                                                    ₹{order.price}
-                                                </p>
+                                                <h3 className="museo-headline text-xl text-white mb-2">
+                                                    {order.product_name}
+                                                </h3>
                                             </div>
 
-                                            <p className="text-sm text-gray-600 mt-2 line-clamp-2 leading-relaxed">
-                                                {order.product_description ||
-                                                    "No description available."}
-                                            </p>
-
-                                            <div className="mt-3 flex items-center gap-4 text-xs text-gray-400">
-                                                <span>Qty: 1</span>
-                                                <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                                <span className="font-mono">ID: {order.id}</span>
+                                            <div className="mt-8 flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest museo-label">
+                                                <span>QTY: 1</span>
+                                                <span className="w-[1px] h-3 bg-white/20"></span>
+                                                <span>REF: {order.id.slice(-8).toUpperCase()}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -255,97 +241,86 @@ export default function OrderProductDetailsPage() {
                         </div>
                     </div>
 
-                    <div className="w-full lg:w-1/3 space-y-6">
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-                            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <CreditCard size={18} className="text-indigo-600" /> Payment Summary
+                    <div className="w-full lg:w-[320px] shrink-0 space-y-12">
+                        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+                            <h3 className="museo-headline text-lg text-white mb-6 flex items-center gap-3 tracking-widest border-b border-white/5 pb-4">
+                                PAYMENT SUMMARY
                             </h3>
-                            <div className="space-y-3 text-sm">
-                                <div className="flex justify-between text-gray-500">
-                                    <span>Subtotal</span>
-                                    <span>₹{order.price}</span>
+                            <div className="space-y-4 pt-2">
+                                <div className="flex justify-between museo-label text-[10px] tracking-widest text-white/60">
+                                    <span>SUBTOTAL</span>
+                                    <span className="text-white">
+                                        ₹{order.price.toLocaleString()}
+                                    </span>
                                 </div>
-                                <div className="flex justify-between text-gray-500">
-                                    <span>Shipping</span>
-                                    <span className="text-emerald-600 font-medium">Free</span>
+                                <div className="flex justify-between museo-label text-[10px] tracking-widest text-white/60">
+                                    <span>SHIPPING</span>
+                                    <span className="text-white">FREE</span>
                                 </div>
-                                <div className="flex justify-between text-gray-500">
-                                    <span>Tax (Inclusive)</span>
-                                    <span>₹0.00</span>
-                                </div>
-                                <div className="border-t border-gray-100 pt-3 mt-3 flex justify-between items-center">
-                                    <span className="font-bold text-gray-900">Total Paid</span>
-                                    <span className="font-bold text-indigo-600 text-lg">
-                                        ₹{order.price}
+                                <div className="border-t border-white/5 pt-6 mt-6 flex justify-between items-end">
+                                    <span className="museo-label text-[10px] text-white uppercase tracking-widest">
+                                        TOTAL AMOUNT
+                                    </span>
+                                    <span className="museo-headline text-xl text-white">
+                                        ₹{order.price.toLocaleString()}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-                            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                <MapPin size={18} className="text-indigo-600" /> Shipping Details
+                        <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                            <h3 className="museo-headline text-lg text-white mb-6 flex items-center gap-3 tracking-widest border-b border-white/5 pb-4">
+                                SHIPPING DETAILS
                             </h3>
 
                             {shippingAddress ? (
-                                <div className="text-sm text-gray-600 space-y-2">
-                                    <div>
-                                        <p className="font-bold text-gray-900 text-base">
-                                            {shippingAddress.name ||
-                                                `${safeUser.first_name} ${safeUser.last_name}`}
-                                        </p>
+                                <div className="museo-body text-sm text-white/50 space-y-2 font-light leading-relaxed">
+                                    <p className="museo-headline text-white text-base mb-4 tracking-wide">
+                                        {shippingAddress.name ||
+                                            `${safeUser.first_name} ${safeUser.last_name}`}
+                                    </p>
+                                    <p>
+                                        {shippingAddress.house_no}
+                                        {shippingAddress.landmark
+                                            ? `, ${shippingAddress.landmark}`
+                                            : ""}
+                                    </p>
+                                    <p>
+                                        {shippingAddress.area}, {shippingAddress.city}
+                                    </p>
+                                    <p>
+                                        {shippingAddress.state}{" "}
+                                        <span className="text-white ml-2">
+                                            {shippingAddress.pin_code}
+                                        </span>
+                                    </p>
 
-                                        <p>
-                                            {shippingAddress.house_no}, {shippingAddress.landmark}
-                                        </p>
-
-                                        <p>
-                                            {shippingAddress.area}, {shippingAddress.city}
-                                        </p>
-
-                                        <p>
-                                            {shippingAddress.state} - {shippingAddress.pin_code}
-                                        </p>
-                                        <p>{shippingAddress.country}</p>
-                                    </div>
-
-                                    <div className="pt-2 border-t border-gray-50 space-y-1">
-                                        <p className="flex items-center gap-2 text-gray-700">
-                                            <Phone size={14} className="text-gray-400" />{" "}
+                                    <div className="pt-6 mt-6 border-t border-white/5 space-y-4">
+                                        <p className="flex items-center gap-4 text-white/60 museo-label text-[10px] tracking-widest">
+                                            <Phone
+                                                size={12}
+                                                strokeWidth={1.5}
+                                                className="text-white/30"
+                                            />
                                             {shippingAddress.phone_number}
                                         </p>
-                                        <p className="flex items-center gap-2 text-gray-700">
-                                            <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                        <p className="flex items-center gap-4 text-white/60 museo-label text-[10px] tracking-widest">
+                                            <Mail
+                                                size={12}
+                                                strokeWidth={1.5}
+                                                className="text-white/30"
+                                            />
                                             {safeUser.email}
                                         </p>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="text-center py-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    <p className="text-gray-400 italic text-sm">
-                                        No address details available
+                                <div className="text-center py-6 bg-white/5 border border-white/10">
+                                    <p className="text-white/30 text-[10px] tracking-widest uppercase museo-label">
+                                        NO ADDRESS FOUND
                                     </p>
                                 </div>
                             )}
-                        </div>
-
-                        <div className="bg-indigo-50 rounded-3xl border border-indigo-100 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
-                            <div className="flex items-start gap-3">
-                                <div className="bg-white p-2 rounded-full text-indigo-600 shadow-sm">
-                                    <HelpCircle size={20} />
-                                </div>
-                                <div>
-                                    <h4 className="font-bold text-indigo-900 text-sm">
-                                        Need Help?
-                                    </h4>
-                                    <p className="text-xs text-indigo-700 mt-1 mb-3">
-                                        Issues with this order? Contact our support team.
-                                    </p>
-                                    <button className="text-xs font-bold bg-white text-indigo-600 px-3 py-1.5 rounded-lg shadow-sm border border-indigo-100 hover:bg-indigo-50 transition-colors">
-                                        Contact Support
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

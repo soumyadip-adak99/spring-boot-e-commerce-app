@@ -1,24 +1,30 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { BASE_API } from "../../utils/constants";
 
-const PUBLIC_API_URL = `${BASE_API}/public`;
-const AUTH_API_URL = `${BASE_API}/auth`;
-const USER_API_URL = `${BASE_API}/user`;
-
 export const registerUser = createAsyncThunk(
     "auth/registerUser",
     async (userData, { rejectWithValue }) => {
         try {
-            const response = await fetch(`${PUBLIC_API_URL}/register`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(userData),
-            });
-
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || "Registration failed");
-
-            return data;
+            await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
+            
+            let users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            
+            // Check if user exists
+            if (users.find(u => u.email === userData.email)) {
+                throw new Error("Email already registered");
+            }
+            
+            const newUser = {
+                id: `usr_${Date.now()}`,
+                ...userData,
+                cart_items: [],
+                address: []
+            };
+            
+            users.push(newUser);
+            localStorage.setItem("demo_users", JSON.stringify(users));
+            
+            return { message: "Registration successful" };
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -29,27 +35,36 @@ export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (credentials, { dispatch, rejectWithValue }) => {
         try {
-            const response = await fetch(`${PUBLIC_API_URL}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(credentials),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) throw new Error(data.error_message || data.message || "Login failed");
-
-            const loginData = data.data;
-            localStorage.setItem("jwtToken", loginData.token);
-
-            const userDetails = await dispatch(getUserDetails());
-
-            if (userDetails.payload) {
-                localStorage.setItem("user", JSON.stringify(userDetails.payload));
-                localStorage.setItem("cart_item", JSON.stringify(userDetails.payload.cart_items));
+            await new Promise(resolve => setTimeout(resolve, 800)); // Simulate delay
+            
+            // Create default demo user if it doesn't exist
+            let users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            if (users.length === 0 || !users.find(u => u.email === "abc@email.com")) {
+                users.push({
+                    id: "demo_usr_01",
+                    first_name: "Demo",
+                    last_name: "User",
+                    email: "abc@email.com",
+                    password: "123456",
+                    cart_items: [],
+                    address: []
+                });
+                localStorage.setItem("demo_users", JSON.stringify(users));
             }
-
-            return { token: loginData.token, user: userDetails.payload };
+            
+            const user = users.find(u => u.email === credentials.email && u.password === credentials.password);
+            
+            if (!user) {
+                throw new Error("Invalid credentials");
+            }
+            
+            const token = `demo_token_${user.id}`;
+            localStorage.setItem("jwtToken", token);
+            localStorage.setItem("loggedInUserId", user.id);
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("cart_item", JSON.stringify(user.cart_items));
+            
+            return { token, user };
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -58,28 +73,14 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async (_, { rejectWithValue }) => {
     try {
-        const token = localStorage.getItem("jwtToken");
-
-        if (token) {
-            await fetch(`${AUTH_API_URL}/logout`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-        }
-
         localStorage.removeItem("jwtToken");
+        localStorage.removeItem("loggedInUserId");
         localStorage.removeItem("user");
         localStorage.removeItem("cart_item");
 
         return { success: true };
     } catch (error) {
-        localStorage.removeItem("jwtToken");
-        localStorage.removeItem("user");
-        localStorage.removeItem("cart_item");
-        return rejectWithValue(error.message);
+        return rejectWithValue("Logout failed");
     }
 });
 
@@ -87,24 +88,17 @@ export const getUserDetails = createAsyncThunk(
     "auth/getUserDetails",
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-
-            if (!token) throw new Error("User unauthorized");
-
-            const response = await fetch(`${USER_API_URL}/user-details`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const data = await response.json();
-
-            if (!response.ok)
-                throw new Error(data.error_message || data.message || "Failed to fetch user");
-
-            return data.data;
+            const userId = localStorage.getItem("loggedInUserId");
+            if (!userId) throw new Error("User unauthorized");
+            
+            const users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) {
+                throw new Error("User not found");
+            }
+            
+            return user;
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -115,28 +109,29 @@ export const addAddress = createAsyncThunk(
     "address/addAddress",
     async (addressData, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-
-            if (!token) {
+            const userId = localStorage.getItem("loggedInUserId");
+            if (!userId) {
                 return rejectWithValue("User not authenticated");
             }
-
-            const response = await fetch(`${USER_API_URL}/add-address`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(addressData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                return rejectWithValue(data.error_message || "Failed to add address");
+            
+            let users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) {
+                return rejectWithValue("User not found");
             }
-
-            return data.data;
+            
+            const newAddress = {
+                id: `addr_${Date.now()}`,
+                ...addressData
+            };
+            
+            users[userIndex].address = users[userIndex].address || [];
+            users[userIndex].address.push(newAddress);
+            
+            localStorage.setItem("demo_users", JSON.stringify(users));
+            
+            return newAddress;
         } catch (error) {
             return rejectWithValue(error.message);
         }

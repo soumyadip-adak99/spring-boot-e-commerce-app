@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { loginUser } from "../features/appFeatures/authSlice";
 
@@ -16,90 +16,92 @@ export default function LoginModal({ onClose, dispatch, isLoading, isError, erro
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h2 className="text-xl font-bold text-gray-800">Welcome Back</h2>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-[#050505] border border-white/10 w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-300 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+                <div className="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-[#0a0a0a]">
+                    <h2 className="museo-headline text-2xl text-white tracking-wide">SIGN IN</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-white/40 hover:text-white transition-colors"
                     >
-                        <X size={24} />
+                        <X size={20} strokeWidth={1.5} />
                     </button>
                 </div>
 
-                <div className="p-6">
+                <div className="p-8">
                     {isError && (
-                        <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
-                            {errorMessage || "Login failed"}
+                        <div className="mb-6 p-4 border border-[#ea0000]/30 bg-[#ea0000]/5 text-white museo-label text-[10px] tracking-widest uppercase">
+                            {errorMessage || "INVALID CREDENTIALS."}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Email Address
+                            <label className="block museo-label text-[10px] text-white/40 uppercase tracking-widest mb-3">
+                                EMAIL ADDRESS
                             </label>
                             <input
                                 type="email"
                                 name="email"
                                 required
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                                placeholder="you@example.com"
+                                className="w-full px-0 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
+                                placeholder="email@example.com"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Password
+                            <label className="block museo-label text-[10px] text-white/40 uppercase tracking-widest mb-3">
+                                PASSWORD
                             </label>
                             <input
                                 type="password"
                                 name="password"
                                 required
-                                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-0 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
                                 placeholder="••••••••"
                                 value={formData.password}
                                 onChange={handleChange}
                             />
                         </div>
 
-                        <div className="flex justify-end">
-                            <a
+                        <div className="flex justify-between items-center pt-2">
+                             <a
                                 href="#"
-                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                                className="museo-label text-[9px] text-white/40 hover:text-white tracking-widest uppercase transition-colors"
                             >
-                                Forgot Password?
+                                FORGOT PASSWORD?
                             </a>
                         </div>
 
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                            className="w-full py-4 border border-white/20 text-[10px] tracking-[0.2em] uppercase text-white hover:bg-white hover:text-black transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white mt-8 museo-label flex justify-center items-center gap-3"
                         >
                             {isLoading ? (
                                 <>
-                                    <Loader2 size={18} className="animate-spin" />
-                                    Signing in...
+                                    <Loader2 size={12} className="animate-spin" />
+                                    PROCESSING...
                                 </>
                             ) : (
-                                "Sign In"
+                                <>
+                                    SIGN IN <ArrowRight size={12} />
+                                </>
                             )}
                         </button>
                     </form>
                 </div>
 
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 text-center">
-                    <p className="text-sm text-gray-600">
-                        Don't have an account?{" "}
+                <div className="px-8 py-6 bg-[#0a0a0a] border-t border-white/5 text-center">
+                    <p className="museo-label text-[9px] tracking-widest text-white/40 uppercase">
+                        NOT A MEMBER?{" "}
                         <Link
-                            to="/register"
+                            to="/auth"
                             onClick={onClose}
-                            className="text-indigo-600 font-semibold hover:underline"
+                            className="text-white hover:text-[#ea0000] border-b border-transparent hover:border-[#ea0000] transition-colors ml-2 pb-0.5"
                         >
-                            Create account
+                            SIGN UP
                         </Link>
                     </p>
                 </div>

@@ -113,51 +113,48 @@ export default function Navbar() {
 
     const getLinkClass = (path) => {
         const isActive = location.pathname === path;
-        return `text-sm font-medium px-4 py-2 rounded-full transition-all duration-200 ${
+        return `museo-label transition-colors duration-300 ${
             isActive
-                ? "text-indigo-600 bg-indigo-50 font-semibold shadow-sm ring-1 ring-indigo-100"
-                : "text-gray-600 hover:text-indigo-600 hover:bg-gray-50"
+                ? "text-white border-b border-white pb-1"
+                : "text-white/50 hover:text-white"
         }`;
     };
 
     return (
         <>
-            <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm font-sans">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center gap-4">
+            <nav className="sticky top-0 z-50 bg-[#050505]/95 backdrop-blur-md border-b border-white/5 font-sans h-[80px] flex items-center">
+                <div className="w-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24">
+                    <div className="flex items-center justify-between h-full">
+                        <div className="flex items-center gap-6">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="lg:hidden text-white/70 hover:text-white transition-colors"
                             >
-                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                                {isMobileMenuOpen ? <X size={24} strokeWidth={1} /> : <Menu size={24} strokeWidth={1} />}
                             </button>
 
-                            <Link to="/" className="flex items-center gap-2 group">
-                                <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-md group-hover:bg-indigo-700 transition-colors">
-                                    <ShoppingBag size={20} />
-                                </div>
-                                <span className="text-xl font-bold text-gray-900 tracking-tight">
-                                    ShopHub
+                            <Link to="/" className="flex items-center gap-3 group">
+                                <span className="museo-headline text-2xl text-white tracking-widest shrink-0">
+                                    LUXE.
                                 </span>
                             </Link>
                         </div>
 
-                        <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-6 sm:gap-8">
                             <Link
                                 to="/products"
                                 className={`hidden md:block ${getLinkClass("/products")}`}
                             >
-                                All Products
+                                Collection
                             </Link>
 
                             <div className="relative hidden sm:block" ref={searchRef}>
-                                <div className="flex items-center bg-gray-200 rounded-full px-4 py-1.5 border border-transparent focus-within:border-indigo-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-100 transition-all w-48 lg:w-64">
-                                    <Search size={18} className="text-gray-700 cursor-pointer" onClick={handleSearchSubmit} />
+                                <div className="flex items-center border-b border-white/20 pb-1 w-48 lg:w-64 transition-colors focus-within:border-white group">
+                                    <Search size={14} className="text-white/40 cursor-pointer group-hover:text-white/70" onClick={handleSearchSubmit} />
                                     <input
                                         type="text"
-                                        placeholder="Search..."
-                                        className="bg-transparent border-none text-sm ml-2 w-full focus:outline-none placeholder-gray-700 text-gray-700"
+                                        placeholder="SEARCH"
+                                        className="bg-transparent border-none w-full focus:outline-none placeholder-white/20 text-white museo-label ml-3 text-[10px]"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         onKeyDown={handleSearchSubmit}
@@ -167,8 +164,8 @@ export default function Navbar() {
                                     />
                                     {searchTerm && (
                                         <X 
-                                            size={14} 
-                                            className="text-gray-500 cursor-pointer hover:text-gray-700" 
+                                            size={12} 
+                                            className="text-white/50 cursor-pointer hover:text-white" 
                                             onClick={() => {
                                                 setSearchTerm("");
                                                 setRecommendations([]);
@@ -178,25 +175,27 @@ export default function Navbar() {
                                 </div>
 
                                 {showRecommendations && recommendations.length > 0 && (
-                                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 max-h-96 overflow-y-auto z-50">
+                                    <div className="absolute top-full left-0 right-0 mt-4 bg-[#0a0a0a] border border-white/10 max-h-96 overflow-y-auto z-50 clip-reveal shadow-2xl">
                                         {recommendations.map((product) => (
                                             <div
                                                 key={product.id}
-                                                className="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-none duration-150"
+                                                className="p-4 hover:bg-white/5 cursor-pointer flex items-center gap-4 border-b border-white/5 last:border-none duration-300 transition-colors group"
                                                 onClick={() => {
                                                     navigate(`/product/${product.id}`);
                                                     setShowRecommendations(false);
                                                     setSearchTerm("");
                                                 }}
                                             >
-                                                <img 
-                                                    src={product.image} 
-                                                    alt={product.product_name} 
-                                                    className="w-10 h-10 object-cover rounded-md"
-                                                />
+                                                <div className="w-12 h-16 bg-[#111] overflow-hidden">
+                                                    <img 
+                                                        src={product.image} 
+                                                        alt={product.product_name} 
+                                                        className="w-full h-full object-contain transition-all duration-500 scale-100 group-hover:scale-110"
+                                                    />
+                                                </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{product.product_name}</p>
-                                                    <p className="text-xs text-gray-500">${product.price}</p>
+                                                    <p className="museo-headline text-sm text-white line-clamp-1 group-hover:text-[#ea0000] transition-colors">{product.product_name}</p>
+                                                    <p className="museo-body text-xs text-white/50 mt-1">₹{product.price}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -206,23 +205,24 @@ export default function Navbar() {
 
                             <button
                                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                                className="sm:hidden p-2 text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
+                                className="sm:hidden text-white/70 hover:text-white transition-colors"
                             >
-                                <Search size={22} />
+                                <Search size={22} strokeWidth={1} />
                             </button>
 
                             <div ref={cartRef} className="relative">
                                 <button
                                     onClick={() => setIsCartOpen(!isCartOpen)}
-                                    className={`p-2 rounded-full relative transition-colors ${
+                                    className={`relative transition-colors flex items-center gap-2 ${
                                         isCartOpen
-                                            ? "bg-indigo-50 text-indigo-600"
-                                            : "text-gray-600 hover:bg-gray-100"
+                                            ? "text-white"
+                                            : "text-white/50 hover:text-white"
                                     }`}
                                 >
-                                    <ShoppingCart size={26} />
+                                    <ShoppingBag size={20} strokeWidth={1.5} />
+                                    <span className="museo-label text-[10px] hidden lg:block">Cart</span>
                                     {finalCartItems.length > 0 && (
-                                        <span className="absolute top-0.5 right-0.5 h-4 w-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-sm ring-2 ring-white">
+                                        <span className="absolute -top-2 -right-2 h-4 w-4 bg-white text-black text-[9px] font-bold flex items-center justify-center rounded-full">
                                             {finalCartItems.length}
                                         </span>
                                     )}
@@ -240,90 +240,68 @@ export default function Navbar() {
                                 <div ref={profileRef} className="relative hidden sm:block">
                                     <button
                                         onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                        className={`flex items-center gap-2 p-1 rounded-full border border-gray-200 transition-all hover:shadow-sm ${
-                                            isProfileOpen
-                                                ? "ring-2 ring-indigo-100 border-indigo-200"
-                                                : "hover:border-indigo-300"
+                                        className={`flex items-center gap-3 transition-colors ${
+                                            isProfileOpen ? "text-[#ea0000]" : "text-white/50 hover:text-white"
                                         }`}
                                     >
-                                        <div className="h-8 w-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-semibold text-sm uppercase">
-                                            {(user?.first_name || "")
-                                                .trim()
-                                                .charAt(0)
-                                                .toUpperCase()}
-                                        </div>
+                                        <User size={20} strokeWidth={1.5} />
+                                        <span className="museo-label text-[10px] hidden lg:block">Account</span>
                                     </button>
 
                                     {isProfileOpen && (
-                                        <div className="absolute right-0 mt-3 w-60 bg-white shadow-xl rounded-xl border border-gray-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                                            <div className="px-5 py-4 border-b border-gray-50 bg-gray-50/50">
-                                                <p className="font-semibold text-gray-900 text-sm">
+                                        <div className="absolute right-0 mt-6 w-64 bg-[#0a0a0a] border border-white/10 z-50 clip-reveal shadow-2xl">
+                                            <div className="p-6 border-b border-white/5">
+                                                <p className="museo-headline text-lg text-white mb-1">
                                                     {user.first_name} {user.last_name}
                                                 </p>
-                                                <p className="text-xs text-gray-500 truncate">
+                                                <p className="museo-body text-xs text-white/40 truncate">
                                                     {user.email}
                                                 </p>
                                             </div>
 
-                                            <div className="p-1.5">
+                                            <div className="p-2">
                                                 <Link
                                                     to="/profile"
-                                                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                                    className="flex items-center px-4 py-3 text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors museo-label"
                                                 >
-                                                    <User
-                                                        size={16}
-                                                        className="mr-3 text-gray-400"
-                                                    />{" "}
-                                                    My Profile
+                                                    <User size={14} className="mr-3" /> Profile
                                                 </Link>
                                                 <Link
                                                     to="/orders"
-                                                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                                    className="flex items-center px-4 py-3 text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors museo-label"
                                                 >
-                                                    <List
-                                                        size={16}
-                                                        className="mr-3 text-gray-400"
-                                                    />{" "}
-                                                    My Orders
+                                                    <List size={14} className="mr-3" /> Orders
                                                 </Link>
                                                 <Link
                                                     to="/settings"
-                                                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                                                    className="flex items-center px-4 py-3 text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors museo-label"
                                                 >
-                                                    <Settings
-                                                        size={16}
-                                                        className="mr-3 text-gray-400"
-                                                    />{" "}
-                                                    Settings
+                                                    <Settings size={14} className="mr-3" /> Settings
                                                 </Link>
                                             </div>
 
-                                            <div className="border-t border-gray-100 p-1.5">
+                                            <div className="border-t border-white/5 p-2 bg-white/5">
                                                 <button
                                                     onClick={handleLogout}
-                                                    className="flex w-full items-center px-4 py-2.5 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors group"
+                                                    className="flex w-full items-center px-4 py-3 text-sm text-[#ea0000] hover:bg-[#ea0000] hover:text-white transition-colors museo-label group"
                                                 >
-                                                    <LogOut
-                                                        size={16}
-                                                        className="mr-3 group-hover:text-red-700"
-                                                    />
-                                                    Sign Out
+                                                    <LogOut size={14} className="mr-3" /> Sign Out
                                                 </button>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                <div className="hidden sm:flex items-center gap-2">
+                                <div className="hidden sm:flex items-center gap-4">
                                     <Link
                                         to="/auth/user"
-                                        className="text-sm font-medium text-gray-600 hover:text-indigo-600 px-4 py-2 transition-colors"
+                                        className="museo-label text-[10px] text-white/50 hover:text-white transition-colors"
                                     >
                                         Login
                                     </Link>
                                     <Link
                                         to="/auth/user"
-                                        className="text-sm font-medium bg-indigo-600 text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg"
+                                        className="museo-label text-[10px] bg-white text-black px-4 py-2 hover:bg-[#ea0000] hover:text-white transition-colors"
                                     >
                                         Register
                                     </Link>
@@ -333,18 +311,19 @@ export default function Navbar() {
                     </div>
                 </div>
 
+                {/* Mobile Search Input Dropdown */}
                 <div
-                    className={`sm:hidden overflow-hidden transition-all duration-300 ease-in-out border-b border-gray-100 bg-gray-50 ${
-                        isMobileSearchOpen ? "max-h-16 opacity-100" : "max-h-0 opacity-0"
+                    className={`sm:hidden absolute top-full left-0 w-full overflow-hidden transition-all duration-300 ease-in-out bg-[#0a0a0a] border-b border-white/5 ${
+                        isMobileSearchOpen ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
                     }`}
                 >
-                    <div className="px-4 py-3">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" onClick={handleSearchSubmit}/>
+                    <div className="px-6 py-4">
+                        <div className="relative flex items-center border-b border-white/20 pb-2">
+                            <Search className="h-4 w-4 text-white/40" onClick={handleSearchSubmit}/>
                             <input
                                 type="text"
                                 autoFocus={isMobileSearchOpen}
-                                className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm outline-none"
+                                className="w-full pl-3 pr-4 bg-transparent border-none text-white museo-label text-[10px] focus:outline-none placeholder-white/20"
                                 placeholder="Search products..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -354,62 +333,61 @@ export default function Navbar() {
                     </div>
                 </div>
 
+                {/* Mobile Menu */}
                 {isMobileMenuOpen && (
                     <div
                         ref={mobileMenuRef}
-                        className="lg:hidden border-t border-gray-100 bg-white shadow-lg animate-in slide-in-from-top-5 duration-200"
+                        className="lg:hidden absolute top-full left-0 w-full border-t border-white/5 bg-[#050505] shadow-2xl clip-reveal"
                     >
-                        <div className="p-4 space-y-2">
+                        <div className="p-6 space-y-6">
                             <Link
                                 to="/products"
-                                className={`block w-full text-left ${getLinkClass("/products")}`}
+                                className={`block w-full museo-headline text-2xl text-white`}
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                All Products
+                                Collection
                             </Link>
 
-                            <div className="border-t border-gray-100 my-2 pt-2">
+                            <div className="border-t border-white/5 pt-6 space-y-4">
                                 {user ? (
                                     <>
-                                        <div className="px-4 py-2 text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                                        <div className="museo-label text-white/30 tracking-[0.3em] mb-4">
                                             {user.first_name} {user.last_name}
                                         </div>
                                         <Link
                                             to="/profile"
-                                            className="flex items-center px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                                            className="flex items-center museo-label text-white/60 hover:text-white"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <User size={18} className="mr-3 text-gray-400" /> My
-                                            Profile
+                                            <User size={14} className="mr-4 text-white/30" /> Profile
                                         </Link>
                                         <Link
                                             to="/orders"
-                                            className="flex items-center px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                                            className="flex items-center museo-label text-white/60 hover:text-white"
                                             onClick={() => setIsMobileMenuOpen(false)}
                                         >
-                                            <List size={18} className="mr-3 text-gray-400" /> My
-                                            Orders
+                                            <List size={14} className="mr-4 text-white/30" /> Orders
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
+                                            className="w-full flex items-center museo-label text-[#ea0000] mt-6"
                                         >
-                                            <LogOut size={18} className="mr-3" /> Sign Out
+                                            <LogOut size={14} className="mr-4" /> Sign Out
                                         </button>
                                     </>
                                 ) : (
-                                    <div className="space-y-3 px-2">
+                                    <div className="space-y-4 flex flex-col mt-4">
                                         <Link
                                             to="/auth/user"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="block w-full text-center py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                                            className="block w-full text-center py-4 border border-white/20 text-white museo-label hover:bg-white hover:text-black transition-colors"
                                         >
                                             Login
                                         </Link>
                                         <Link
                                             to="/auth/user"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="block w-full text-center py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                                            className="block w-full text-center py-4 bg-white text-black museo-label hover:bg-[#ea0000] hover:text-white transition-colors"
                                         >
                                             Register
                                         </Link>

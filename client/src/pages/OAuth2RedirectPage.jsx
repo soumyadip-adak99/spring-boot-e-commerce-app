@@ -27,10 +27,17 @@ function OAuth2RedirectPage() {
     }, [searchParams, navigate, dispatch]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600 mx-auto mb-4"></div>
-                <p className="text-gray-600 text-lg">Completing sign in...</p>
+        <div className="flex items-center justify-center min-h-screen bg-black text-white relative z-10 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-black/80 to-black/40 z-0" />
+            
+            <div className="text-center relative z-10 animate-in fade-in zoom-in duration-700">
+                <div className="relative w-20 h-20 mx-auto mb-8">
+                    <div className="absolute inset-0 rounded-full border-t-2 border-highlight animate-spin shadow-glow"></div>
+                    <div className="absolute inset-2 rounded-full border-r-2 border-white/20 animate-spin flex-reverse hidden"></div>
+                </div>
+                <p className="text-white/50 text-sm font-bold uppercase tracking-widest animate-pulse">
+                    Completing sign in...
+                </p>
             </div>
         </div>
     );

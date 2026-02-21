@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+    ArrowRight,
     ArrowLeft,
     Loader2,
     ShoppingBag,
@@ -140,124 +141,37 @@ function CheckoutPage() {
                 }
             } else if (paymentMethod === "ONLINE") {
                 setIsProcessing(true);
-                const isScriptLoaded = await loadRazorpayScript(
-                    "https://checkout.razorpay.com/v1/checkout.js"
-                );
-
-                if (!isScriptLoaded) {
-                    alert("Razorpay SDK failed to load.");
-                    setIsProcessing(false);
-                    return;
-                }
-
-                const token = localStorage.getItem("jwtToken");
-                let createRes, createData;
-
-                if (id) {
-                     // Single Product Razorpay Order
-                    createRes = await fetch(
-                        `${import.meta.env.VITE_BACKEND_BASE_API}/payment/create-order`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify({
-                                product_id: product.id,
-                                quantity: 1,
-                            }),
-                        }
-                    );
-                } else {
-                    // TODO: Backend needs to support creating razorpay order for CART total
-                    // For now, blocking online payment for cart or handling it if backend supports
-                    // Assuming similar endpoint or updated params. 
-                    // Since specific Razorpay Cart endpoint wasn't in plan, we might need value-add logic here
-                    // blocking for now or treating as "total amount" request
-                    alert("Online payment for Cart is coming soon! Please use COD.");
-                    setIsProcessing(false);
-                    return;
-                }
+                // Simulate online payment delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                createData = await createRes.json();
-
-                if (!createRes.ok) {
-                    alert(createData.error_message || "Failed to create payment order");
-                    setIsProcessing(false);
-                    return;
+                let resultAction;
+                if (id) {
+                    resultAction = await dispatch(
+                        createOrder({
+                            id: product.id,
+                            orderData: { ...baseOrderData, payment_status: "SUCCESS" },
+                        })
+                    ).unwrap();
+                } else {
+                    resultAction = await dispatch(
+                        createOrderFromCart({
+                             ...baseOrderData, 
+                             payment_status: "SUCCESS" 
+                        })
+                    ).unwrap();
                 }
 
-                const { order_id, amount, currency, key } = createData.data;
+                const newOrderId = resultAction.id || resultAction.order?.id || resultAction.data?.id || resultAction.orderId;
 
-                // Step 2: Open Razorpay checkout
-                const options = {
-                    key: key,
-                    amount: amount,
-                    currency: currency,
-                    order_id: order_id,
-                    name: "ShopHub Store",
-                    description: id ? `Order for ${product.product_name}` : "Cart Order",
-                    image: id ? product.image : "https://via.placeholder.com/150", // generic image for cart
-                    prefill: {
-                        name: `${safeUser.first_name} ${safeUser.last_name}`,
-                        email: safeUser.email,
-                        contact: selectedAddress.phone_number,
-                    },
-                    theme: { color: "#4f46e5" },
-                    handler: async function (response) {
-                        try {
-                            // Step 3: Verify payment on backend
-                            const verifyBody = {
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                address_id: selectedAddress.id,
-                            };
-                            
-                            if (id) {
-                                verifyBody.product_id = product.id;
-                                verifyBody.quantity = 1;
-                            } else {
-                                // For cart, we might need a different verification endpoint or updated one
-                                // Assuming verify handles it or it's part of the pending TODO
-                            }
-
-                            const verifyRes = await fetch(
-                                `${import.meta.env.VITE_BACKEND_BASE_API}/payment/verify`,
-                                {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                        Authorization: `Bearer ${token}`,
-                                    },
-                                    body: JSON.stringify(verifyBody),
-                                }
-                            );
-                            const verifyData = await verifyRes.json();
-
-                            if (verifyRes.ok && verifyData.data) {
-                                const newOrderId = verifyData.data.id;
-                                dispatch(resetOrderState());
-                                navigate(`/product-checkout/success/${newOrderId}`);
-                            } else {
-                                alert(verifyData.error_message || "Payment verification failed");
-                            }
-                        } catch (err) {
-                            alert("Payment successful but verification failed. Contact support.");
-                        } finally {
-                            setIsProcessing(false);
-                        }
-                    },
-                    modal: {
-                        ondismiss: function () {
-                            setIsProcessing(false);
-                        },
-                    },
-                };
-                const paymentObject = new window.Razorpay(options);
-                paymentObject.open();
+                if (newOrderId) {
+                    dispatch(resetOrderState());
+                    navigate(`/product-checkout/success/${newOrderId}`);
+                }
+                setIsProcessing(false);
             }
+
+
+            
         } catch (error) {
             console.error("Order failed:", error);
             alert(error.message || "Something went wrong.");
@@ -298,20 +212,20 @@ function CheckoutPage() {
 
     if (productLoading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-indigo-600">
-                <Loader2 className="h-12 w-12 animate-spin mb-4" />
-                <p className="font-medium text-gray-600">Fetching product details...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] relative z-10 text-[#f0f0f0]">
+                <Loader2 className="h-8 w-8 animate-spin mb-4" />
+                <p className="museo-label text-white/50">Fetching details...</p>
             </div>
         );
     }
 
     if (id && !product) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-                <p className="font-medium text-gray-600">Product not found.</p>
-                <Link to="/" className="mt-4 text-indigo-600 hover:underline">
-                    Go Home
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] relative z-10 text-center px-4">
+                <AlertCircle className="h-10 w-10 text-white/20 mb-6" />
+                <p className="museo-body text-white/50 max-w-sm mb-6">The product you are attempting to checkout cannot be found.</p>
+                <Link to="/" className="museo-label text-white hover:text-[#ea0000] border border-white/20 px-6 py-3 transition-colors">
+                    Return to Products
                 </Link>
             </div>
         );
@@ -319,35 +233,35 @@ function CheckoutPage() {
 
     if (!id && cartItems.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <ShoppingBag className="h-12 w-12 text-gray-400 mb-4" />
-                <p className="font-medium text-gray-600">Your cart is empty.</p>
-                <Link to="/products" className="mt-4 text-indigo-600 hover:underline">
-                    Start Shopping
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505] relative z-10 text-center px-4">
+                <ShoppingBag className="h-10 w-10 text-white/20 mb-6" />
+                <p className="museo-body text-white/50 max-w-sm mb-6">Your cart is empty.</p>
+                <Link to="/products" className="museo-label text-white hover:text-[#ea0000] border border-white/20 px-6 py-3 transition-colors">
+                    Continue Shopping
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50/50 pb-20 font-sans relative">
-            <div className="bg-indigo-600 h-48 w-full absolute top-0 left-0 z-0 shadow-md"></div>
-
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-8">
+        <div className="min-h-screen bg-[#050505] pb-24 font-sans relative text-[#f0f0f0] z-10 overflow-x-hidden selection:bg-[#ea0000] selection:text-white">
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 relative z-10 pt-20 fade-in-up visible stagger-1">
                 <Link
-                    to={`/products/`}
-                    className="inline-flex items-center gap-2 text-indigo-100 hover:text-white font-medium mb-8 transition-colors"
+                    to={id ? `/product/${id}` : `/cart`}
+                    className="inline-flex items-center gap-3 museo-label text-white/40 hover:text-white mb-12 transition-colors fade-in-up visible stagger-2"
                 >
-                    <ArrowLeft size={20} /> Back to Product
+                    <ArrowLeft size={16} /> Back to {id ? 'Product' : 'Cart'}
                 </Link>
 
-                <h1 className="text-3xl font-bold text-white mb-8">Checkout</h1>
+                <h1 className="museo-headline text-5xl md:text-6xl lg:text-7xl mb-16 clip-reveal">Checkout.</h1>
 
-                <div className="flex flex-col lg:flex-row gap-8">
-                    <div className="flex-1 space-y-6">
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-                                <MapPin className="text-indigo-600" size={20} /> Shipping Address
+                <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 fade-in-up visible stagger-3">
+                    {/* Left Column - Forms */}
+                    <div className="flex-1 space-y-16">
+                        {/* Shipping Section */}
+                        <section>
+                            <h2 className="museo-headline text-2xl md:text-3xl mb-8 flex items-center gap-4 text-white/90">
+                                <span className="text-[#ea0000] text-sm">01</span> Shipping Address
                             </h2>
 
                             <div className="space-y-4">
@@ -356,53 +270,49 @@ function CheckoutPage() {
                                         <div
                                             key={index}
                                             onClick={() => setSelectedAddressIndex(index)}
-                                            className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                                            className={`relative p-6 sm:p-8 cursor-pointer transition-all duration-300 border ${
                                                 selectedAddressIndex === index
-                                                    ? "border-indigo-600 bg-indigo-50/30 ring-1 ring-indigo-600"
-                                                    : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
+                                                    ? "border-white bg-white/5"
+                                                    : "border-white/10 hover:border-white/30 bg-transparent"
                                             }`}
                                         >
                                             <div className="flex justify-between items-start">
-                                                <div>
-                                                    <p className="font-bold text-gray-900">
+                                                <div className="pr-12">
+                                                    <p className="museo-headline text-lg sm:text-xl text-white mb-2">
                                                         {addr.name || safeUser.first_name}{" "}
-                                                        <span className="text-gray-500 font-normal text-sm">
-                                                            ({addr.type || "Home"})
+                                                        <span className="museo-label text-white/40 ml-3">
+                                                            {addr.type || "Home"}
                                                         </span>
                                                     </p>
-                                                    <p className="text-sm text-gray-600 mt-1">
-                                                        {addr.house_no}, {addr.area},{" "}
-                                                        {addr.landmark ? `${addr.landmark}, ` : ""}
+                                                    <p className="museo-body text-white/60">
+                                                        {addr.house_no}, {addr.area}
+                                                        {addr.landmark ? `, ${addr.landmark}` : ""}
                                                     </p>
-                                                    <p className="text-sm text-gray-600">
-                                                        {addr.city}, {addr.state} - {addr.pin_code}
+                                                    <p className="museo-body text-white/60">
+                                                        {addr.city}, {addr.state} — {addr.pin_code}
                                                     </p>
-                                                    <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
-                                                        Phone:{" "}
-                                                        <span className="text-gray-900 font-medium">
-                                                            {addr.phone_number}
-                                                        </span>
+                                                    <p className="museo-body text-white/60 mt-4">
+                                                        T: <span className="text-white/80">{addr.phone_number}</span>
                                                     </p>
                                                 </div>
-                                                {selectedAddressIndex === index && (
-                                                    <CheckCircle
-                                                        className="text-indigo-600 fill-indigo-100"
-                                                        size={24}
-                                                    />
-                                                )}
+                                                <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                                    selectedAddressIndex === index ? 'border-white' : 'border-white/20'
+                                                }`}>
+                                                    {selectedAddressIndex === index && <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-white rounded-full"></div>}
+                                                </div>
                                             </div>
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center py-8 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                                        <p className="text-gray-500 text-sm mb-3">
-                                            No delivery addresses found.
+                                    <div className="py-12 border-t border-b border-white/10 text-center">
+                                        <p className="museo-body text-white/40 mb-6">
+                                            No delivery addresses saved.
                                         </p>
                                         <button
                                             onClick={() => setShowAddressModal(true)}
-                                            className="text-indigo-600 font-bold text-sm hover:underline"
+                                            className="museo-label border border-white/20 px-8 py-3 hover:bg-white hover:text-black transition-colors"
                                         >
-                                            + Add New Address
+                                            Add Address
                                         </button>
                                     </div>
                                 )}
@@ -410,92 +320,80 @@ function CheckoutPage() {
                                 {addresses.length > 0 && (
                                     <button
                                         onClick={() => setShowAddressModal(true)}
-                                        className="flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-800 mt-2 transition-colors"
+                                        className="museo-label flex items-center gap-3 text-white/50 hover:text-white mt-6 transition-colors"
                                     >
-                                        <Plus size={16} /> Add New Address
+                                        <Plus size={16} /> New Address
                                     </button>
                                 )}
                             </div>
-                        </div>
+                        </section>
 
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-                                <CreditCard className="text-indigo-600" size={20} /> Payment Method
+                        {/* Payment Section */}
+                        <section>
+                            <h2 className="museo-headline text-2xl md:text-3xl mb-8 flex items-center gap-4 text-white/90">
+                                <span className="text-[#ea0000] text-sm">02</span> Payment Method
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div
                                     onClick={() => setPaymentMethod("COD")}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${
+                                    className={`p-6 sm:p-8 border cursor-pointer transition-all duration-300 flex items-center gap-5 ${
                                         paymentMethod === "COD"
-                                            ? "border-indigo-600 bg-indigo-50/30"
-                                            : "border-gray-200 hover:border-indigo-300"
+                                            ? "border-white bg-white/5"
+                                            : "border-white/10 hover:border-white/30 bg-transparent"
                                     }`}
                                 >
-                                    <div
-                                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                            paymentMethod === "COD"
-                                                ? "border-indigo-600"
-                                                : "border-gray-300"
-                                        }`}
-                                    >
-                                        {paymentMethod === "COD" && (
-                                            <div className="w-2.5 h-2.5 bg-indigo-600 rounded-full" />
-                                        )}
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                        paymentMethod === "COD" ? "border-white" : "border-white/20"
+                                    }`}>
+                                        {paymentMethod === "COD" && <div className="w-2 h-2 bg-white rounded-full" />}
                                     </div>
-                                    <span className="font-bold text-gray-700">
+                                    <span className="museo-headline text-lg sm:text-xl">
                                         Cash on Delivery
                                     </span>
                                 </div>
 
                                 <div
                                     onClick={() => setPaymentMethod("ONLINE")}
-                                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3 ${
+                                    className={`p-6 sm:p-8 border cursor-pointer transition-all duration-300 flex items-center gap-5 ${
                                         paymentMethod === "ONLINE"
-                                            ? "border-indigo-600 bg-indigo-50/30"
-                                            : "border-gray-200 hover:border-indigo-300"
+                                            ? "border-white bg-white/5"
+                                            : "border-white/10 hover:border-white/30 bg-transparent"
                                     }`}
                                 >
-                                    <div
-                                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                            paymentMethod === "ONLINE"
-                                                ? "border-indigo-600"
-                                                : "border-gray-300"
-                                        }`}
-                                    >
-                                        {paymentMethod === "ONLINE" && (
-                                            <div className="w-2.5 h-2.5 bg-indigo-600 rounded-full" />
-                                        )}
+                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                                        paymentMethod === "ONLINE" ? "border-white" : "border-white/20"
+                                    }`}>
+                                        {paymentMethod === "ONLINE" && <div className="w-2 h-2 bg-white rounded-full" />}
                                     </div>
-                                    <span className="font-bold text-gray-700">
-                                        Pay Online (UPI/Card)
+                                    <span className="museo-headline text-lg sm:text-xl">
+                                        Online Payment
                                     </span>
                                 </div>
                             </div>
-                        </div>
+                        </section>
                     </div>
 
-                    <div className="w-full lg:w-[400px]">
-                        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sticky top-6">
-                            <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-6">
-                                <ShoppingBag className="text-indigo-600" size={20} /> Order Summary
-                            </h2>
+                    {/* Right Column - Summary */}
+                    <div className="w-full lg:w-[440px] shrink-0">
+                        <div className="sticky top-12 bg-[#0a0a0a] border border-white/10 p-8 sm:p-10 fade-in-up visible stagger-4">
+                            <h2 className="museo-headline text-2xl mb-8 border-b border-white/10 pb-6">Summary</h2>
 
-                            <div className="space-y-4 mb-6 pb-6 border-b border-gray-100 max-h-80 overflow-y-auto pr-2">
+                            <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto pr-4 hide-scrollbar">
                                 {orderItems.map((item, idx) => (
-                                    <div key={idx} className="flex gap-4">
-                                        <div className="h-16 w-16 shrink-0 rounded-lg bg-gray-100 border border-gray-200 p-1">
+                                    <div key={idx} className="flex gap-6 items-center group">
+                                        <div className="h-24 w-20 shrink-0 bg-[#111] overflow-hidden">
                                             <img
                                                 src={item.product?.image}
                                                 alt={item.product?.product_name}
-                                                className="h-full w-full object-contain mix-blend-multiply"
+                                                className="h-full w-full object-cover transition-all duration-500 hover:scale-105"
                                             />
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-gray-900 line-clamp-2 text-sm leading-snug">
+                                        <div className="flex-1">
+                                            <h3 className="museo-headline text-lg line-clamp-1 mb-1">
                                                 {item.product?.product_name}
                                             </h3>
-                                            <p className="text-gray-500 text-xs mt-1">Quantity: {item.quantity}</p>
-                                            <p className="text-indigo-600 font-bold mt-1 text-sm">
+                                            <p className="museo-label text-white/40 mb-2">QTY: {item.quantity}</p>
+                                            <p className="museo-body text-white/80">
                                                 {formatPrice(item.product?.price || 0)}
                                             </p>
                                         </div>
@@ -503,226 +401,181 @@ function CheckoutPage() {
                                 ))}
                             </div>
 
-                            <div className="space-y-3 text-sm mb-6">
-                                <div className="flex justify-between text-gray-600">
+                            <div className="space-y-4 pt-6 border-t border-white/10">
+                                <div className="flex justify-between museo-body text-white/60">
                                     <span>Subtotal</span>
                                     <span>{formatPrice(subtotal)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
+                                <div className="flex justify-between museo-body text-white/60">
                                     <span>Shipping</span>
-                                    <span className="text-green-600 font-medium">Free</span>
+                                    <span>Calculated at checkout</span>
                                 </div>
-                                <div className="border-t border-gray-100 pt-3 flex justify-between font-bold text-lg text-gray-900">
-                                    <span>Total Amount</span>
-                                    <span>{formatPrice(totalAmount)}</span>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2 mb-6 text-[10px] text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                <div className="flex flex-col items-center gap-1 text-center">
-                                    <ShieldCheck size={18} className="text-green-600" />
-                                    <span>100% Secure Payment</span>
-                                </div>
-                                <div className="flex flex-col items-center gap-1 text-center">
-                                    <Truck size={18} className="text-blue-600" />
-                                    <span>Fast & Free Delivery</span>
+                                <div className="flex justify-between items-end pt-6 mt-6 border-t border-white/10">
+                                    <span className="museo-label text-white/60">Total</span>
+                                    <span className="museo-headline text-3xl">{formatPrice(totalAmount)}</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handlePlaceOrder}
                                 disabled={orderLoading || isProcessing || addresses.length === 0}
-                                className={`w-full py-4 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 ${
+                                className={`w-full mt-10 py-5 px-6 museo-label transition-all flex items-center justify-center gap-3 ${
                                     orderLoading || isProcessing || addresses.length === 0
-                                        ? "bg-indigo-400 cursor-not-allowed"
-                                        : "bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+                                        ? "bg-white/5 text-white/30 cursor-not-allowed border-none"
+                                        : "bg-white text-black hover:bg-[#ea0000] hover:text-white"
                                 }`}
                             >
                                 {orderLoading || isProcessing ? (
-                                    <>
-                                        <Loader2 className="animate-spin h-5 w-5" /> Processing...
-                                    </>
+                                    <span className="flex items-center gap-3">
+                                        <Loader2 className="animate-spin h-4 w-4" /> Processing
+                                    </span>
                                 ) : (
-                                    "Place Order"
+                                    <span className="flex items-center gap-3 text-sm">
+                                        Confirm Order <ArrowRight size={16} />
+                                    </span>
                                 )}
                             </button>
 
                             {addresses.length === 0 && (
-                                <p className="text-red-500 text-xs text-center mt-3 font-medium bg-red-50 py-1 px-2 rounded">
-                                    Please add a shipping address to proceed.
+                                <p className="museo-label text-white/40 text-center mt-6">
+                                    Shipping address required.
                                 </p>
                             )}
+                            
+                            <div className="mt-10 pt-8 border-t border-white/5 flex grid grid-cols-2 gap-4">
+                                <div className="flex flex-col gap-2">
+                                    <ShieldCheck size={20} className="text-white/30" />
+                                    <span className="museo-label text-[10px] text-white/40 leading-relaxed">Encrypted<br/>Transaction</span>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <Truck size={20} className="text-white/30" />
+                                    <span className="museo-label text-[10px] text-white/40 leading-relaxed">Insured<br/>Transit</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            {/* Address Modal Fragment */}
             {showAddressModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#050505]/90 backdrop-blur-sm">
+                    <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-3xl p-8 sm:p-12 relative max-h-[90vh] overflow-y-auto clip-reveal">
                         <button
                             onClick={() => setShowAddressModal(false)}
-                            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors"
+                            className="absolute top-8 right-8 text-white/40 hover:text-white transition-colors"
                         >
-                            <X size={24} />
+                            <X size={28} strokeWidth={1.5} />
                         </button>
 
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <MapPin className="text-indigo-600" /> Add New Address
+                        <h2 className="museo-headline text-3xl mb-10">
+                            New Address
                         </h2>
 
-                        <form onSubmit={handleSaveAddress} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        Full Name
-                                    </label>
+                        <form onSubmit={handleSaveAddress} className="space-y-8">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">Full Name</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="name"
-                                        value={addressFormData.name}
-                                        onChange={handleAddressChange}
-                                        placeholder="John Doe"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                        required type="text" name="name"
+                                        value={addressFormData.name} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
+                                        placeholder="Enter name"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        Phone Number
-                                    </label>
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">Telephone</label>
                                     <input
-                                        required
-                                        type="tel"
-                                        name="phone_number"
-                                        value={addressFormData.phone_number}
-                                        onChange={handleAddressChange}
-                                        placeholder="10-digit mobile number"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                        required type="tel" name="phone_number"
+                                        value={addressFormData.phone_number} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
+                                        placeholder="10-digit number"
                                     />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        Pin-Code / Zip-Code
-                                    </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">Postal Code</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="pin_code"
-                                        value={addressFormData.pin_code}
-                                        onChange={handleAddressChange}
+                                        required type="text" name="pin_code"
+                                        value={addressFormData.pin_code} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
                                         placeholder="e.g. 560001"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        House No / Flat
-                                    </label>
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">Premises</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="house_no"
-                                        value={addressFormData.house_no}
-                                        onChange={handleAddressChange}
-                                        placeholder="Flat 4B, Building Name"
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                        required type="text" name="house_no"
+                                        value={addressFormData.house_no} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
+                                        placeholder="Flat, House no."
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-sm font-semibold text-gray-700">
-                                    Area / Street / Village
-                                </label>
-                                <textarea
-                                    required
-                                    rows="2"
-                                    name="area"
-                                    value={addressFormData.area}
-                                    onChange={handleAddressChange}
-                                    placeholder="Enter street details"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all resize-none"
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-sm font-semibold text-gray-700">
-                                    Landmark (Optional)
-                                </label>
+                            <div className="space-y-3">
+                                <label className="museo-label text-white/40">Street / Area</label>
                                 <input
-                                    type="text"
-                                    name="landmark"
-                                    value={addressFormData.landmark}
-                                    onChange={handleAddressChange}
-                                    placeholder="Near City Hospital"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                    required type="text" name="area"
+                                    value={addressFormData.area} onChange={handleAddressChange}
+                                    className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
+                                    placeholder="Enter street details"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        City
-                                    </label>
+                            <div className="space-y-3">
+                                <label className="museo-label text-white/40">Landmark (Optional)</label>
+                                <input
+                                    type="text" name="landmark"
+                                    value={addressFormData.landmark} onChange={handleAddressChange}
+                                    className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors placeholder:text-white/10"
+                                    placeholder="Near prominent location"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">City</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="city"
-                                        value={addressFormData.city}
-                                        onChange={handleAddressChange}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                        required type="text" name="city"
+                                        value={addressFormData.city} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        State
-                                    </label>
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">State</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="state"
-                                        value={addressFormData.state}
-                                        onChange={handleAddressChange}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 outline-none transition-all"
+                                        required type="text" name="state"
+                                        value={addressFormData.state} onChange={handleAddressChange}
+                                        className="w-full bg-transparent border-b border-white/20 pb-3 text-white museo-body focus:border-white outline-none transition-colors"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-semibold text-gray-700">
-                                        Country
-                                    </label>
+                                <div className="space-y-3">
+                                    <label className="museo-label text-white/40">Country</label>
                                     <input
-                                        required
-                                        type="text"
-                                        name="country"
-                                        value={addressFormData.country}
-                                        readOnly
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-600 outline-none cursor-not-allowed"
+                                        required type="text" name="country"
+                                        value={addressFormData.country} readOnly
+                                        className="w-full bg-transparent border-b border-white/10 pb-3 text-white/30 museo-body outline-none cursor-not-allowed"
                                     />
                                 </div>
                             </div>
 
-                            <div className="pt-4 flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddressModal(false)}
-                                    className="flex-1 py-3 px-4 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
+                            <div className="pt-8 flex gap-4 mt-8">
                                 <button
                                     type="submit"
                                     disabled={isAddingAddress}
-                                    className="flex-1 py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    className="px-10 py-4 bg-white text-black museo-label hover:bg-[#ea0000] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]"
                                 >
-                                    {isAddingAddress ? (
-                                        <Loader2 className="animate-spin" size={20} />
-                                    ) : (
-                                        "Save Address"
-                                    )}
+                                    {isAddingAddress ? <Loader2 className="animate-spin" size={20} /> : "Save Address"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddressModal(false)}
+                                    className="px-8 py-4 border border-white/20 text-white museo-label hover:border-white transition-colors"
+                                >
+                                    Cancel
                                 </button>
                             </div>
                         </form>

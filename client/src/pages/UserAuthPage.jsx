@@ -57,6 +57,10 @@ function UserAuthPage() {
     };
 
     useEffect(() => {
+        window.scrollTo(0,0);
+    }, [isLoginView]);
+
+    useEffect(() => {
         if (isSuccess) {
             if (!isLoginView) {
                 setTimeout(() => {
@@ -79,107 +83,91 @@ function UserAuthPage() {
     }, [dispatch]);
 
     return (
-        <div className="min-h-screen flex bg-gray-50">
-            <div className="hidden lg:flex w-1/2 bg-indigo-600 relative overflow-hidden">
-                <div className="absolute inset-0 bg-linear-to-br from-indigo-600 to-violet-700 opacity-90" />
-                <img
-                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
-                    alt="Shopping Experience"
-                    className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60"
-                />
+        <div className="min-h-screen flex bg-[#050505] text-white relative z-10 overflow-x-hidden selection:bg-[#ea0000] selection:text-white">
+            <div className="hidden lg:flex w-1/2 bg-[#050505] relative overflow-hidden border-r border-white/5">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center opacity-60"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent"></div>
+                <div className="noise-overlay" />
 
-                <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                        backgroundImage:
-                            "radial-gradient(circle at 2px 2px, white 1px, transparent 0)",
-                        backgroundSize: "32px 32px",
-                    }}
-                ></div>
-
-                <div className="relative z-10 flex flex-col justify-center px-16 text-white h-full max-w-2xl">
-                    <div className="mb-8 p-3 bg-white/10 backdrop-blur-sm w-fit rounded-xl">
-                        <ShoppingBag size={32} />
+                <div className="relative z-20 flex flex-col justify-center px-24 h-full max-w-2xl animate-in fade-in slide-in-from-left-8 duration-1000">
+                    <div className="mb-12">
+                         <div className="w-16 h-[1px] bg-white mb-6" />
                     </div>
-                    <h1 className="text-5xl font-bold mb-6 tracking-tight leading-tight">
-                        {isLoginView ? "Welcome back to ShopHub." : "Start your journey with us."}
+                    <h1 className="museo-headline text-5xl xl:text-6xl text-white leading-tight mb-8 tracking-tight clip-reveal">
+                        {isLoginView ? "Welcome\nBack." : "Join Us."}
                     </h1>
-                    <p className="text-lg text-indigo-100 leading-relaxed font-light">
+                    <p className="museo-body text-lg text-white/50 leading-relaxed max-w-lg fade-in-up visible stagger-1">
                         {isLoginView
-                            ? "Access your saved items, track orders, and get personalized recommendations in one place."
-                            : "Join thousands of shoppers discovering the best deals and exclusive products every day."}
+                            ? "Sign in to access your account and manage your orders."
+                            : "Create an account to discover and purchase exceptional products."}
                     </p>
                 </div>
             </div>
 
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-20 bg-white relative">
+            {/* Right Auth Panel */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-16 lg:p-24 bg-[#0a0a0a] relative">
                 <Link
                     to="/"
-                    className="absolute top-6 left-6 sm:top-8 sm:left-8 flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors group"
+                    className="absolute top-8 left-8 sm:top-12 sm:left-12 flex items-center gap-3 text-white/40 hover:text-white transition-colors museo-label text-[10px] tracking-widest uppercase pb-1 border-b border-transparent hover:border-white"
                 >
-                    <div className="p-2 rounded-full group-hover:bg-indigo-50 transition-colors">
-                        <ArrowLeft size={20} />
-                    </div>
-                    <span className="font-medium text-sm">Back to Home</span>
+                    <ArrowLeft size={12} />
+                    <span>RETURN</span>
                 </Link>
 
-                <div className="w-full max-w-md space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                    <div className="text-center">
-                        <div className="flex justify-center mb-4 lg:hidden">
-                            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
-                                <ShoppingBag size={20} />
-                            </div>
+                <div className="w-full max-w-md space-y-12 animate-in slide-in-from-bottom-8 fade-in flex flex-col justify-center h-full pt-16 lg:pt-0 duration-700">
+                    <div className="text-left">
+                        <div className="flex mb-8 lg:hidden">
+                             <div className="w-12 h-[1px] bg-white" />
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-                            {isLoginView ? "Sign in to account" : "Create free account"}
+                        <h2 className="museo-headline text-4xl text-white tracking-tight mb-4">
+                            {isLoginView ? "Sign In" : "Register"}
                         </h2>
-                        <p className="mt-2 text-sm text-gray-500">
-                            {isLoginView ? "New here? " : "Already have an account? "}
+                        <p className="mt-4 text-xs text-white/40 tracking-widest museo-label">
+                            {isLoginView ? "NEW USER? " : "EXISTING USER? "}
                             <button
                                 onClick={toggleView}
-                                className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors focus:outline-none"
+                                className="text-white hover:text-[#ea0000] border-b border-transparent hover:border-[#ea0000] transition-colors focus:outline-none uppercase tracking-widest ml-1"
                             >
-                                {isLoginView ? "Create an account" : "Sign in"}
+                                {isLoginView ? "CREATE ACCOUNT" : "SIGN IN"}
                             </button>
                         </p>
                     </div>
 
                     {isError && (
-                        <div className="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 flex items-center gap-2 animate-in fade-in">
-                            <span className="w-1.5 h-1.5 bg-red-600 rounded-full" />
-                            {"Email and Password is incorrect" ||
-                                "Action failed. Please try again."}
+                        <div className="p-4 border border-[#ea0000]/30 bg-[#ea0000]/5 text-white museo-label text-[10px] tracking-widest uppercase flex items-center gap-4 animate-in fade-in">
+                            <span className="w-1.5 h-1.5 bg-[#ea0000]" />
+                            {isLoginView ? "INVALID CREDENTIALS." : "REGISTRATION FAILED. TRY AGAIN."}
                         </div>
                     )}
                     {isSuccess && (
-                        <div className="p-4 rounded-xl bg-green-50 text-green-700 text-sm border border-green-100 flex items-center gap-2 animate-in fade-in">
-                            <span className="w-1.5 h-1.5 bg-green-600 rounded-full" />
+                        <div className="p-4 border border-white/30 bg-white/5 text-white museo-label text-[10px] tracking-widest uppercase flex items-center gap-4 animate-in fade-in">
+                            <span className="w-1.5 h-1.5 bg-white" />
                             {isLoginView
-                                ? "Login successful! Redirecting..."
-                                : "Account created successfully! Switching..."}
+                                ? "LOGIN SUCCESSFUL. REDIRECTING..."
+                                : "ACCOUNT CREATED. PROCEED TO SIGN IN."}
                         </div>
                     )}
 
-                    <form className="space-y-5" onSubmit={handleSubmit}>
+                    <form className="space-y-8" onSubmit={handleSubmit}>
                         {!isLoginView && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in slide-in-from-top-2 fade-in duration-300">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 animate-in slide-in-from-top-4 fade-in duration-500">
                                 <div>
                                     <label
                                         htmlFor="first_name"
-                                        className="block text-xs font-medium text-gray-700 mb-1"
+                                        className="block text-[10px] text-white/40 mb-3 uppercase tracking-widest museo-label"
                                     >
-                                        First Name
+                                        FIRST NAME
                                     </label>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <User className="h-4 w-4 text-gray-500" />
+                                        <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                                            <User className="h-4 w-4 text-white/20" />
                                         </div>
                                         <input
                                             id="first_name"
                                             name="first_name"
                                             type="text"
                                             required={!isLoginView}
-                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 bg-gray-200/50 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                                            className="block w-full pl-8 pr-0 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
                                             placeholder="John"
                                             value={formData.first_name}
                                             onChange={handleChange}
@@ -189,20 +177,20 @@ function UserAuthPage() {
                                 <div>
                                     <label
                                         htmlFor="last_name"
-                                        className="block text-xs font-medium text-gray-700 mb-1"
+                                        className="block text-[10px] text-white/40 mb-3 uppercase tracking-widest museo-label"
                                     >
-                                        Last Name
+                                        LAST NAME
                                     </label>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <User className="h-4 w-4 text-gray-500" />
+                                        <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                                            <User className="h-4 w-4 text-white/20" />
                                         </div>
                                         <input
                                             id="last_name"
                                             name="last_name"
                                             type="text"
                                             required={!isLoginView}
-                                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 bg-gray-200/50 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                                            className="block w-full pl-8 pr-0 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
                                             placeholder="Doe"
                                             value={formData.last_name}
                                             onChange={handleChange}
@@ -215,21 +203,21 @@ function UserAuthPage() {
                         <div>
                             <label
                                 htmlFor="email"
-                                className="block text-xs font-medium text-gray-700 mb-1"
+                                className="block text-[10px] text-white/40 mb-3 uppercase tracking-widest museo-label"
                             >
-                                Email Address
+                                EMAIL ADDRESS
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-4 w-4 text-gray-500" />
+                                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                                    <Mail className="h-4 w-4 text-white/20" />
                                 </div>
                                 <input
                                     id="email"
                                     name="email"
                                     type="email"
                                     required
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl text-gray-900 bg-gray-200/50 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
-                                    placeholder="you@example.com"
+                                    className="block w-full pl-8 pr-0 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
+                                    placeholder="email@example.com"
                                     value={formData.email}
                                     onChange={handleChange}
                                 />
@@ -237,32 +225,32 @@ function UserAuthPage() {
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center justify-between mb-3">
                                 <label
                                     htmlFor="password"
-                                    className="block text-xs font-medium text-gray-700"
+                                    className="block text-[10px] text-white/40 uppercase tracking-widest museo-label"
                                 >
-                                    Password
+                                    PASSWORD
                                 </label>
                                 {isLoginView && (
                                     <a
                                         href="#"
-                                        className="text-xs font-medium text-indigo-600 hover:text-indigo-500"
+                                        className="text-[10px] text-white/40 hover:text-white transition-colors uppercase tracking-widest museo-label"
                                     >
-                                        Forgot password?
+                                        FORGOT PASSWORD?
                                     </a>
                                 )}
                             </div>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 text-gray-500" />
+                                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                                    <Lock className="h-4 w-4 text-white/20" />
                                 </div>
                                 <input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     required
-                                    className="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl text-gray-900 bg-gray-200/50 placeholder-gray-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
+                                    className="block w-full pl-8 pr-12 py-3 bg-transparent border-b border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-white transition-all museo-body text-sm"
                                     placeholder="••••••••"
                                     value={formData.password}
                                     onChange={handleChange}
@@ -270,36 +258,36 @@ function UserAuthPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                                    className="absolute inset-y-0 right-0 pr-0 flex items-center text-white/20 hover:text-white transition-colors"
                                 >
-                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
                             </div>
                         </div>
 
                         {!isLoginView && (
-                            <div className="flex items-center animate-in fade-in">
+                            <div className="flex items-start animate-in fade-in pt-4">
                                 <input
                                     id="terms"
                                     name="terms"
                                     type="checkbox"
                                     required
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                                    className="mt-0.5 h-4 w-4 text-[#ea0000] focus:ring-[#ea0000] bg-transparent border-white/20 rounded-none cursor-pointer accent-[#ea0000]"
                                 />
-                                <label htmlFor="terms" className="ml-2 block text-xs text-gray-600">
-                                    I agree to the{" "}
+                                <label htmlFor="terms" className="ml-4 block text-[10px] text-white/50 tracking-widest uppercase museo-label leading-relaxed">
+                                    I ACCEPT THE{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-gray-900 hover:underline"
+                                        className="text-white hover:text-[#ea0000] transition-colors border-b border-white/30 hover:border-[#ea0000] pb-0.5"
                                     >
-                                        Terms
+                                        TERMS OF SERVICE
                                     </a>{" "}
-                                    and{" "}
+                                    AND{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-gray-900 hover:underline"
+                                        className="text-white hover:text-[#ea0000] transition-colors border-b border-white/30 hover:border-[#ea0000] pb-0.5"
                                     >
-                                        Privacy Policy
+                                        PRIVACY POLICY
                                     </a>
                                 </label>
                             </div>
@@ -308,40 +296,41 @@ function UserAuthPage() {
                         <button
                             type="submit"
                             disabled={isLoading || isSuccess}
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed disabled:active:scale-100"
+                            className="w-full py-5 border border-white/20 text-[10px] tracking-[0.2em] uppercase text-white hover:bg-white hover:text-black transition-all disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white mt-8 museo-label flex justify-center items-center"
                         >
                             {isLoading ? (
-                                <span className="flex items-center gap-2">
-                                    <Loader2 className="animate-spin h-4 w-4" /> Processing...
+                                <span className="flex items-center gap-3">
+                                    <Loader2 className="animate-spin h-3 w-3" /> PROCESSING...
                                 </span>
                             ) : (
-                                <span className="flex items-center gap-2">
-                                    {isLoginView ? "Sign In" : "Create Account"}
+                                <span className="flex items-center gap-3">
+                                    {isLoginView ? "SIGN IN" : "REGISTER"}
                                     {isLoginView ? (
-                                        <LogIn className="h-4 w-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+                                        <LogIn className="h-3 w-3" strokeWidth={2} />
                                     ) : (
-                                        <ArrowRight className="h-4 w-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+                                        <ArrowRight className="h-3 w-3" strokeWidth={2} />
                                     )}
                                 </span>
                             )}
                         </button>
 
-                        {/* Divider */}
-                        <div className="relative my-4">
+                        <div className="relative my-10">
                             <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-200"></div>
+                                <div className="w-full border-t border-white/10"></div>
                             </div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="px-3 bg-white text-gray-500 font-medium">OR</span>
+                            <div className="relative flex justify-center text-[9px] tracking-widest museo-label">
+                                <span className="px-6 bg-[#0a0a0a] text-white/30 uppercase">
+                                    OR
+                                </span>
                             </div>
                         </div>
 
                         {/* Google Sign-In Button */}
                         <a
                             href={`${import.meta.env.VITE_BACKEND_BASE_API?.replace("/api/v1", "")}/oauth2/authorization/google`}
-                            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm active:scale-[0.98]"
+                            className="w-full flex items-center justify-center gap-4 py-4 border border-white/10 text-[10px] text-white/60 hover:text-white hover:border-white transition-all uppercase tracking-widest museo-label"
                         >
-                            <svg className="h-5 w-5" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4" viewBox="0 0 24 24">
                                 <path
                                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
                                     fill="#4285F4"
@@ -359,7 +348,7 @@ function UserAuthPage() {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            Continue with Google
+                            CONTINUE WITH GOOGLE
                         </a>
                     </form>
                 </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { CheckCircle, ArrowLeft, Package, MapPin, Calendar } from "lucide-react";
+import { CheckCircle, ArrowLeft, Package, MapPin, Calendar, CreditCard } from "lucide-react";
 import { getProductById } from "../features/product/productAction";
 
 function SuccessOrderPage() {
@@ -19,117 +19,121 @@ function SuccessOrderPage() {
         }
 
         setOrderId(`ORD-${Math.floor(100000 + Math.random() * 900000)}`);
+        window.scrollTo(0,0);
     }, [id, dispatch]);
 
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5);
 
     const formattedDate = deliveryDate.toLocaleDateString("en-IN", {
-        weekday: "long",
+        weekday: "short",
         year: "numeric",
-        month: "long",
+        month: "short",
         day: "numeric",
     });
 
     if (isLoading || !product) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <p className="text-gray-500">Loading order details...</p>
+            <div className="min-h-screen flex items-center justify-center bg-[#050505] relative z-10 text-white">
+                <p className="museo-label text-[10px] text-white/40 tracking-widest uppercase">Completing Order...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6 font-sans">
-            <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-                <div className="bg-emerald-50 p-8 text-center border-b border-emerald-100">
-                    <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-4 shadow-sm">
-                        <CheckCircle className="text-emerald-600 w-8 h-8" />
+        <div className="min-h-screen bg-[#050505] flex items-center justify-center p-6 lg:p-12 font-sans text-white relative z-10 selection:bg-[#ea0000] selection:text-white pb-32">
+            <div className="w-full max-w-4xl border border-white/5 bg-[#0a0a0a] relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                <div className="border-b border-white/5 p-12 lg:p-20 text-center relative overflow-hidden bg-white/5">
+                    <div className="mx-auto w-16 h-16 border border-white/20 bg-white text-black flex items-center justify-center mb-8">
+                        <CheckCircle size={24} strokeWidth={1.5} />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-                    <p className="text-gray-500 text-lg">
-                        Thank you for your purchase. Your order has been received.
+                    <h1 className="museo-headline text-4xl lg:text-5xl text-white mb-6 tracking-tight">Order Confirmed.</h1>
+                    <p className="museo-body text-white/50 text-lg max-w-lg mx-auto mb-10">
+                        Your transaction was successful. Your items are being prepared for dispatch.
                     </p>
-                    <p className="text-sm font-semibold text-emerald-700 mt-2 bg-emerald-100 inline-block px-3 py-1 rounded-full">
-                        Order ID: {orderId}
-                    </p>
+                    <div className="inline-flex flex-col items-center">
+                        <span className="museo-label text-[10px] text-white/40 tracking-[0.2em] uppercase mb-2">Transaction ID</span>
+                        <span className="museo-headline text-xl text-white tracking-widest border-b border-white/20 pb-1">{orderId}</span>
+                    </div>
                 </div>
 
-                <div className="p-8">
-                    <div className="flex flex-col sm:flex-row gap-4 mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                        <div className="flex items-start gap-3 flex-1">
-                            <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
-                                <Calendar size={20} />
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                                    Estimated Delivery
-                                </p>
-                                <p className="text-sm font-semibold text-gray-900">
-                                    {formattedDate}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="hidden sm:block w-px bg-gray-200"></div>
+                <div className="p-8 lg:p-16 flex flex-col lg:flex-row gap-12">
+                    <div className="flex-1 space-y-12">
+                        <div>
+                            <h2 className="museo-headline text-2xl text-white mb-8 pb-4 border-b border-white/5">Item Details</h2>
 
-                        <div className="flex items-start gap-3 flex-1">
-                            <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm">
-                                <MapPin size={20} />
-                            </div>
-                            <div>
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-                                    Shipping Method
-                                </p>
-                                <p className="text-sm font-semibold text-gray-900">
-                                    Standard Shipping
-                                </p>
+                            <div className="flex flex-col sm:flex-row gap-8 bg-[#111] border border-white/5 p-6 hover:border-white/20 transition-colors">
+                                <div className="w-full sm:w-32 h-32 bg-[#050505] border border-white/5 flex items-center justify-center p-4">
+                                    <img
+                                        src={product.image}
+                                        alt={product.product_name}
+                                        className="w-full h-full object-contain transition-all duration-700 hover:scale-105"
+                                    />
+                                </div>
+
+                                <div className="flex-1 flex flex-col justify-center">
+                                    <span className="museo-label text-[10px] text-white/40 tracking-widest uppercase mb-2">
+                                        {product.category}
+                                    </span>
+                                    <h3 className="museo-headline text-2xl text-white mb-4">
+                                        {product.product_name}
+                                    </h3>
+                                    <div className="flex justify-between items-end mt-auto">
+                                        <span className="museo-label text-[10px] text-white/40 tracking-widest uppercase">QTY: 1</span>
+                                        <span className="museo-headline text-xl text-white">₹{product.price.toLocaleString()}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <Package size={20} className="text-gray-400" />
-                        Order Summary
-                    </h2>
-
-                    <div className="flex flex-col sm:flex-row gap-6 p-4 rounded-2xl border border-gray-100 hover:shadow-md transition-shadow">
-                        <div className="w-full sm:w-32 h-32 bg-gray-100 rounded-xl overflow-hidden">
-                            <img
-                                src={product.image}
-                                alt={product.product_name}
-                                className="w-full h-full object-contain mix-blend-multiply p-2"
-                            />
-                        </div>
-
-                        <div className="flex-1 flex flex-col justify-center">
-                            <div className="mb-1">
-                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
-                                    {product.category}
-                                </span>
+                    <div className="w-full lg:w-72 shrink-0 space-y-10">
+                        <div>
+                            <h2 className="museo-headline text-lg text-white mb-6 pb-4 border-b border-white/5 flex items-center gap-3">
+                                <Calendar size={16} className="text-white/40" /> Logistics
+                            </h2>
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="museo-label text-[10px] text-white/40 tracking-widest uppercase mb-1">Expected Arrival</p>
+                                    <p className="museo-body text-white">{formattedDate}</p>
+                                </div>
+                                <div className="pt-4 border-t border-white/5">
+                                    <p className="museo-label text-[10px] text-white/40 tracking-widest uppercase mb-1">Standard Delivery</p>
+                                    <p className="museo-body text-white">Courier service</p>
+                                </div>
                             </div>
+                        </div>
 
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                {product.product_name}
-                            </h3>
-
-                            <p className="text-gray-500 text-sm leading-relaxed">
-                                {product.product_description}
-                            </p>
+                        <div>
+                            <h2 className="museo-headline text-lg text-white mb-6 pb-4 border-b border-white/5 flex items-center gap-3">
+                                <CreditCard size={16} className="text-white/40" /> Payment Summary
+                            </h2>
+                            <div className="space-y-4">
+                                <div className="flex justify-between">
+                                    <span className="museo-label text-[10px] text-white/40 tracking-widest uppercase">Product</span>
+                                    <span className="museo-body text-white">₹{product.price.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="museo-label text-[10px] text-white/40 tracking-widest uppercase">Shipping</span>
+                                    <span className="museo-body text-[#ea0000]">FREE</span>
+                                </div>
+                                <div className="pt-4 border-t border-white/5 flex justify-between items-end">
+                                    <span className="museo-label text-[10px] text-white tracking-widest uppercase">TOTAL AMOUNT</span>
+                                    <span className="museo-headline text-2xl text-white">₹{product.price.toLocaleString()}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center">
-                        <button
-                            onClick={() => navigate("/products")}
-                            className="group flex items-center gap-2 bg-gray-900 text-white font-bold py-3.5 px-8 rounded-xl shadow-lg hover:bg-gray-800 hover:shadow-xl transition-all active:scale-95"
-                        >
-                            <ArrowLeft
-                                size={18}
-                                className="group-hover:-translate-x-1 transition-transform"
-                            />
-                            Return to Shop
-                        </button>
-                    </div>
+                <div className="p-12 border-t border-white/5 bg-[#111] flex justify-center text-center">
+                    <button
+                        onClick={() => navigate("/products")}
+                        className="museo-label text-[10px] tracking-[0.2em] uppercase border border-white/20 text-white flex items-center gap-4 px-10 py-5 hover:bg-white hover:text-black transition-all"
+                    >
+                        <ArrowLeft size={12} />
+                        CONTINUE SHOPPING
+                    </button>
                 </div>
             </div>
         </div>

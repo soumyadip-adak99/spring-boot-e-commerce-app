@@ -14,14 +14,21 @@ import SuccessOrderPage from "./pages/SuccessOrderPage";
 import OAuth2RedirectPage from "./pages/OAuth2RedirectPage";
 import ProductDetailsPage from "./pages/ProductDetailsPage";
 import { Toaster } from "react-hot-toast";
+import { CustomCursor } from "./components/CustomCursor";
+import { ParticleField } from "./components/ParticleField";
 
 function App() {
     return (
         <BrowserRouter>
-            <Toaster />
-            <ScrollToTop />
-            <Routes>
-                <Route path="/" element={<HomePage />} />
+            <div className="relative min-h-screen bg-black text-white overflow-x-hidden">
+                <div className="noise-overlay" />
+                <CustomCursor />
+                <ParticleField />
+                
+                <Toaster />
+                <ScrollToTop />
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<AllProducts />} />
                 <Route path="/product/:id" element={<ProductDetailsPage />} />
 
@@ -91,7 +98,8 @@ function App() {
                 <Route path="/oauth2/redirect" element={<OAuth2RedirectPage />} />
 
                 <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+                </Routes>
+            </div>
         </BrowserRouter>
     );
 }

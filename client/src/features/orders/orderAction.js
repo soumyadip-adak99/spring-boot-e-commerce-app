@@ -3,31 +3,36 @@ import { BASE_API } from "../../utils/constants";
 
 export const createOrder = createAsyncThunk(
     "order/createOrder",
-    async ({ id, orderData }, { rejectWithValue }) => {
+    async ({ id, orderData }, { dispatch, rejectWithValue }) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-
-            if (!token) {
-                return rejectWithValue("Unauthorized: Token missing");
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate payment delay
+            
+            const userId = localStorage.getItem("loggedInUserId");
+            if (!userId) {
+                return rejectWithValue("Unauthorized: User missing");
             }
-
-            const response = await fetch(`${BASE_API}/user/create-order/${id}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(orderData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                return rejectWithValue(
-                    data.error_message || data.message || "Order creation failed"
-                );
+            
+            let users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) {
+                return rejectWithValue("User not found");
             }
-            return data.data;
+            
+            const newOrder = {
+                orderId: `OD${Math.floor(Math.random() * 10000000000)}`,
+                ...orderData,
+                status: "processing",
+                date: new Date().toISOString()
+            };
+            
+            users[userIndex].orders = users[userIndex].orders || [];
+            users[userIndex].orders.push(newOrder);
+            
+            localStorage.setItem("demo_users", JSON.stringify(users));
+            dispatch(getUserDetails());
+            
+            return newOrder;
         } catch (error) {
             return rejectWithValue(error.message || "Something went wrong");
         }
@@ -36,31 +41,39 @@ export const createOrder = createAsyncThunk(
 
 export const createOrderFromCart = createAsyncThunk(
     "order/createOrderFromCart",
-    async (orderData, { rejectWithValue }) => {
+    async (orderData, { dispatch, rejectWithValue }) => {
         try {
-            const token = localStorage.getItem("jwtToken");
-
-            if (!token) {
-                return rejectWithValue("Unauthorized: Token missing");
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate payment delay
+            
+            const userId = localStorage.getItem("loggedInUserId");
+            if (!userId) {
+                return rejectWithValue("Unauthorized: User missing");
             }
-
-            const response = await fetch(`${BASE_API}/user/create-order/cart`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(orderData),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                return rejectWithValue(
-                    data.error_message || data.message || "Order creation failed"
-                );
+            
+            let users = JSON.parse(localStorage.getItem("demo_users")) || [];
+            const userIndex = users.findIndex(u => u.id === userId);
+            
+            if (userIndex === -1) {
+                return rejectWithValue("User not found");
             }
-            return data.data;
+            
+            const newOrder = {
+                orderId: `OD${Math.floor(Math.random() * 10000000000)}`,
+                ...orderData,
+                status: "processing",
+                date: new Date().toISOString()
+            };
+            
+            users[userIndex].orders = users[userIndex].orders || [];
+            users[userIndex].orders.push(newOrder);
+            
+            // Clear cart after checkout
+            users[userIndex].cart_items = [];
+            
+            localStorage.setItem("demo_users", JSON.stringify(users));
+            dispatch(getUserDetails());
+            
+            return newOrder;
         } catch (error) {
             return rejectWithValue(error.message || "Something went wrong");
         }
