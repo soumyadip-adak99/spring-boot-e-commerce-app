@@ -163,10 +163,12 @@ export default function AllProducts() {
     }
 
     return (
-        <div className="bg-[#050505] min-h-screen font-sans text-white relative z-10 selection:bg-[#ea0000] selection:text-white pb-32">
-            <Navbar />
+        <div className="bg-[#050505] min-h-screen lg:h-screen lg:overflow-hidden flex flex-col font-sans text-white relative z-10 selection:bg-[#ea0000] selection:text-white">
+            <div className="shrink-0">
+                <Navbar />
+            </div>
 
-            <div className="sticky top-[80px] z-40 bg-[#050505]/95 backdrop-blur-md border-b border-white/5 shadow-sm">
+            <div className="shrink-0 sticky top-[80px] lg:static lg:top-auto z-40 bg-[#050505]/95 backdrop-blur-md border-b border-white/5 shadow-sm">
                 <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 py-6">
                     <nav className="flex items-center text-white/30 mb-8 museo-label text-[10px] tracking-widest">
                         <Link to="/" className="hover:text-white transition-colors">
@@ -221,7 +223,7 @@ export default function AllProducts() {
             </div>
 
             {isMobileFiltersOpen && (
-                <div className="lg:hidden bg-[#0a0a0a] border-b border-white/5 p-8">
+                <div className="shrink-0 lg:hidden bg-[#0a0a0a] border-b border-white/5 p-8 max-h-[40vh] overflow-y-auto pro-scrollbar">
                     <CategoryFilter
                         selectedCategory={selectedCategory}
                         setSelectedCategory={setSelectedCategory}
@@ -233,26 +235,27 @@ export default function AllProducts() {
                 </div>
             )}
 
-            <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 py-16">
-                <div className="flex flex-col lg:flex-row gap-16 lg:gap-24">
-                    <aside className="hidden lg:block w-64 shrink-0 fade-in-up visible stagger-2">
-                        <div className="sticky top-48">
-                            <div className="flex items-center gap-3 mb-12 text-white pb-4 border-b border-white/10 uppercase tracking-widest museo-label text-[10px]">
-                                <Filter size={12} className="text-[#ea0000]" />
-                                <span>Refine Products</span>
+            <div className="flex-1 lg:overflow-hidden">
+                <div className="lg:h-full max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 py-8">
+                    <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 lg:h-full">
+                        <aside className="hidden lg:flex flex-col w-64 shrink-0 lg:h-full fade-in-up visible stagger-2">
+                            <div className="flex-1 lg:overflow-y-auto pr-2 pb-10 pro-scrollbar relative">
+                                <div className="sticky top-0 bg-[#050505] z-10 pt-2 pb-4 mb-8 flex items-center gap-3 text-white border-b border-white/10 uppercase tracking-widest museo-label text-[10px]">
+                                    <Filter size={12} className="text-[#ea0000]" />
+                                    <span>Refine Products</span>
+                                </div>
+                                <CategoryFilter
+                                    selectedCategory={selectedCategory}
+                                    setSelectedCategory={setSelectedCategory}
+                                    maxPrice={maxPrice}
+                                    setMaxPrice={setMaxPrice}
+                                    categories={categories}
+                                    priceRange={priceRange}
+                                />
                             </div>
-                            <CategoryFilter
-                                selectedCategory={selectedCategory}
-                                setSelectedCategory={setSelectedCategory}
-                                maxPrice={maxPrice}
-                                setMaxPrice={setMaxPrice}
-                                categories={categories}
-                                priceRange={priceRange}
-                            />
-                        </div>
-                    </aside>
+                        </aside>
 
-                    <main className="flex-1 min-w-0 fade-in-up visible stagger-3">
+                        <main className="flex-1 lg:h-full min-w-0 lg:overflow-y-auto pr-2 pb-24 pro-scrollbar fade-in-up visible stagger-3">
                         {filteredProducts.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-32 px-4 border border-white/5 bg-[#0a0a0a] text-center">
                                 <Search size={32} className="text-[#ea0000] mb-6" strokeWidth={1} />
@@ -287,6 +290,7 @@ export default function AllProducts() {
                         )}
                     </main>
                 </div>
+            </div>
             </div>
         </div>
     );
