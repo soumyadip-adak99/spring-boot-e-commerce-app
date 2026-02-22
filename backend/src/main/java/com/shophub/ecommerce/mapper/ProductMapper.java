@@ -12,6 +12,7 @@ public class ProductMapper {
                 .productName(product.getProductName())
                 .productDescription(product.getProductDescription())
                 .status(product.getStatus())
+                .category(product.getCategory())
                 .image(product.getImage())
                 .price(product.getPrice())
                 .createdAt(product.getCreatedAt())

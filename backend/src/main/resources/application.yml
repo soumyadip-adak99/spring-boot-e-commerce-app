@@ -7,7 +7,7 @@ spring:
 
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb}
+      uri: ${MONGODB_URI}
       database: ${MONGODB_DATABASE}
     redis:
       host: ${REDIS_HOST}
@@ -93,7 +93,7 @@ razorpay:
 
 # CORS Configuration
 cors:
-  allowed-origins: http://localhost:5173,http://localhost:5174,https://towards-functioning-bradford-tri.trycloudflare.com
+  allowed-origins: http://localhost:5173,http://localhost:5174
 
 # Logging
 logging:
